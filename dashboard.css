@@ -1,0 +1,120 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+  background: #0f1115;
+  color: white;
+  font-family: sans-serif;
+}
+
+/* HEADER */
+.header {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px 30px;
+  background: #1a1d24;
+}
+
+.header button {
+  padding: 8px 15px;
+  background: crimson;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+/* LAYOUT */
+.container {
+  display: flex;
+  gap: 15px;
+  padding: 20px;
+}
+
+/* PANELS */
+.panel {
+  background: #1a1d24;
+  padding: 15px;
+  border-radius: 10px;
+  width: 25%;
+}
+
+.main {
+  width: 50%;
+}
+
+/* LIST */
+ul {
+  list-style: none;
+  margin-top: 10px;
+}
+
+li {
+  background: #2a2f3a;
+  padding: 10px;
+  margin-bottom: 8px;
+  border-radius: 5px;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* ADD BOX */
+.add-box {
+  display: flex;
+  gap: 10px;
+}
+
+.add-box input {
+  flex: 1;
+  padding: 10px;
+}
+
+.add-box button {
+  padding: 10px;
+  cursor: pointer;
+}
+/* TOAST CONTAINER */
+#toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 999;
+}
+
+/* TOAST BOX */
+.toast {
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 12px 18px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  min-width: 220px;
+  font-size: 14px;
+  opacity: 0;
+  transform: translateX(100%);
+  transition: all 0.4s ease;
+}
+
+/* SHOW */
+.toast.show {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* SUCCESS */
+.toast.success {
+  border-left: 4px solid #4caf50;
+}
+
+/* ERROR */
+.toast.error {
+  border-left: 4px solid #f44336;
+}
+
+/* INFO */
+.toast.info {
+  border-left: 4px solid #2196f3;
+}

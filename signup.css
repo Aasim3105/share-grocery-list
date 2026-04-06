@@ -1,0 +1,241 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+.background-img {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    min-height: 100vh;
+    object-fit: cover;
+    z-index: -1;
+    filter: brightness(30%) blur(3px)
+}
+body {
+display: flex;
+justify-content: center;
+align-items: center;
+min-height: 100vh;
+} 
+/*  BODY SCROLLBAR */
+html {
+  scroll-behavior: smooth;
+}
+body::-webkit-scrollbar {
+  width: 8px;
+}
+body::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  backdrop-filter: blur(5px);
+}
+body::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #767778, #262627);
+  border-radius: 10px;
+  transition: 0.3s;
+}
+body::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #a9adae, #57585a);
+  box-shadow: 0 0 10px #495052;
+}
+body::-webkit-scrollbar-thumb:active {
+  background: #544f4f;
+}
+body::-webkit-scrollbar-corner {
+  background: transparent;
+}
+/* END BODY SCROLLBAR */
+.form {
+    margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background-color: #ffffff25;
+  padding: 30px;
+  width: 450px;
+  border-radius: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  backdrop-filter: blur(5px);
+}
+
+::placeholder {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  color: rgb(255, 255, 255, 0.75);;
+}
+
+.form button {
+  align-self: flex-end;
+}
+
+.flex-column > label {
+  color: white;
+  font-weight: 600;
+}
+
+.inputForm {
+  border: 1.5px solid #b2b4b2;
+  border-radius: 10px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  padding-left: 10px;
+  transition: 0.2s ease-in-out;
+}
+.inputForm svg {
+  fill: white;
+}
+.icon {
+  fill: white;
+}
+
+.input {
+  margin-left: 10px;
+  border-radius: 10px;
+  border: none;
+  width: 100%;
+  height: 100%;
+  /* backdrop-filter: blur(0.01px); */
+  background: transparent;
+border: 3px solid transparent;
+font-weight: 500;
+color: #ecedec;
+}
+/* Autofill fix (Chrome) */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #ffffff; /* text white */
+  transition: background-color 5000s ease-in-out 0s;
+}
+.eye-logo {
+  color: rgba(255, 255, 255, 0.783);
+  cursor: pointer;
+  margin: 3px;
+  font-weight: 200;
+  font-size: 23px;
+  transition: transform 0.3ms;
+}
+.eye-logo:active {
+  transform: scale(0.92);
+}
+input::-ms-reveal {
+  display: none;
+}
+.input:focus {
+  outline: none;
+}
+
+.inputForm:focus-within {
+  border: 1.5px solid #042f74a7;
+}
+/* SELECT DROPDOWN STYLE */
+.role-select {
+  appearance: none;
+  background: transparent;
+  color: white;
+  width: 100%;
+  height: 100%;
+  border: none;
+  padding-left: 5px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* OPTION STYLE */
+.role-select option {
+  background: #1a1d24b7;  
+  backdrop-filter: blur(2px);
+  color: white;
+}
+
+/* CUSTOM ARROW */
+.role-select {
+  position: relative;
+}
+
+.role-select::after {
+  content: "▼";
+  position: absolute;
+  right: 15px;
+  color: rgba(255, 255, 255, 0.7);
+  pointer-events: none;
+  font-size: 12px;
+}
+/* FOCUS EFFECT */
+.role-select:focus {
+  outline: none;
+}
+/* END SELECT OPTION */
+
+.flex-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.flex-row > div > label {
+  font-size: 14px;
+  color: rgb(255, 255, 255);
+  font-weight: 400;
+}
+
+.span {
+  font-size: 14px;
+  margin-left: 5px;
+  color: #2d79f3;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.button-submit {
+  margin: 20px 0 10px 0;
+  background-color: #090b0bc4;
+  backdrop-filter: blur(22px);
+  border: none;
+  color: white;
+  font-size: 15px;
+  font-weight: 500;
+  border-radius: 10px;
+  height: 50px;
+  width: 100%;
+  cursor: pointer;
+}
+
+.button-submit:hover {
+  background-color: #252727;
+}
+
+.p {
+  text-align: center;
+  color: rgb(255, 255, 255);
+  font-size: 14px;
+  margin: 5px 0;
+}
+
+.btn {
+  margin-top: 10px;
+  width: 100%;
+  height: 50px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 500;
+  gap: 10px;
+  border: 1px solid #ededef;
+  background-color: white;
+  cursor: pointer;
+  transition: 0.2s ease-in-out;
+}
+
+.btn:hover {
+  border: 1px solid #2d79f3;
+  ;
+}
+
+    

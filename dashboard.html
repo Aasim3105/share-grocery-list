@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+
+<body>
+
+<!-- HEADER -->
+ <h2>Welcome <span id="username"></span> 👋</h2>
+<div class="header">
+  <h2>🛒 Grocery Dashboard</h2>
+  <button onclick="logout()">Logout</button>
+</div>
+
+
+<!-- MAIN -->
+<div class="container">
+
+  <!-- LEFT PANEL (USERS) -->
+  <div class="panel">
+    <h3>Users</h3>
+    <ul id="userList"></ul>
+  </div>
+
+  <!-- CENTER (GROCERY LIST) -->
+  <div class="panel main">
+    <h3>Shared Grocery List</h3>
+
+    <div class="add-box">
+      <input type="text" id="itemInput" placeholder="Add grocery item...">
+      <button onclick="addItem()">Add</button>
+    </div>
+
+    <ul id="groceryList"></ul>
+  </div>
+
+  <!-- RIGHT PANEL (ADMIN / MANAGER) -->
+<!-- MANAGER -->
+<div class="panel manager-panel">
+  <h3>Manager Panel</h3>
+  <button onclick="clearList()">Clear All Items</button>
+</div>
+
+<!-- ADMIN -->
+<div class="panel admin-panel">
+  <h3>Admin Panel</h3>
+  <button onclick="deleteUsers()">Delete All Users</button>
+</div>
+
+</div>
+<div id="toast-container"></div>
+<script src="dashboard.js"></script>
+</body>
+</html>
