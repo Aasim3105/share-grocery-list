@@ -1,4 +1,4 @@
-// ================= CURRENT USER =================
+// CURRENT USER 
 const currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
 if (!currentUser) {
@@ -8,7 +8,7 @@ if (!currentUser) {
 document.getElementById("username").textContent = currentUser.name;
 
 
-// ================= ROLE BASED UI =================
+//ROLE BASED UI
 if (currentUser.role !== "admin") {
   document.querySelector(".admin-panel").style.display = "none";
 }
@@ -18,12 +18,12 @@ if (currentUser.role !== "manager" && currentUser.role !== "admin") {
 }
 
 
-// ================= LOAD DATA =================
+// LOAD DATA 
 let groceryList = JSON.parse(localStorage.getItem("grocery")) || [];
 let users = JSON.parse(localStorage.getItem("users")) || [];
 
 
-// ================= DEMO USERS =================
+//  DEMO USERS
 if (users.length === 0) {
   users.push(
     { name: "Aasim" },
@@ -34,7 +34,7 @@ if (users.length === 0) {
 }
 
 
-// ================= SHOW USERS =================
+// SHOW USERS
 function showUsers() {
   const ul = document.getElementById("userList");
   ul.innerHTML = "";
@@ -56,7 +56,7 @@ function showUsers() {
 }
 
 
-// ================= REMOVE SINGLE USER =================
+//REMOVE SINGLE USER
 function removeUser(index) {
   users.splice(index, 1);
   localStorage.setItem("users", JSON.stringify(users));
@@ -66,7 +66,7 @@ function removeUser(index) {
 }
 
 
-// ================= SHOW GROCERY =================
+// SHOW GROCERY
 function showItems() {
   const ul = document.getElementById("groceryList");
   ul.innerHTML = "";
@@ -84,7 +84,7 @@ function showItems() {
 }
 
 
-// ================= ADD ITEM =================
+// ADD ITEM 
 function addItem() {
   const input = document.getElementById("itemInput");
   const value = input.value.trim();
@@ -104,7 +104,7 @@ function addItem() {
 }
 
 
-// ================= DELETE ITEM =================
+//  DELETE ITEM 
 function deleteItem(index) {
   groceryList.splice(index, 1);
   localStorage.setItem("grocery", JSON.stringify(groceryList));
@@ -114,7 +114,7 @@ function deleteItem(index) {
 }
 
 
-// ================= CLEAR LIST (MANAGER) =================
+// CLEAR LIST (MANAGER) 
 function clearList() {
   groceryList = [];
   localStorage.setItem("grocery", JSON.stringify(groceryList));
@@ -124,7 +124,7 @@ function clearList() {
 }
 
 
-// ================= DELETE ALL USERS (ADMIN) =================
+//  DELETE ALL USERS (ADMIN) 
 function deleteUsers() {
   users = [];
   localStorage.setItem("users", JSON.stringify(users));
@@ -134,14 +134,14 @@ function deleteUsers() {
 }
 
 
-// ================= LOGOUT =================
+// LOGOUT 
 function logout() {
   localStorage.removeItem("currentUser");
   window.location.href = "signin.html";
 }
 
 
-// ================= TOAST =================
+// TOAST
 function showToast(message, type = "info") {
   const container = document.getElementById("toast-container");
 
