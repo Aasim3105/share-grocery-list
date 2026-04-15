@@ -1,0 +1,935 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CartShare – Shared Grocery List</title>
+    <link rel="stylesheet" href="cartshare.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: {
+                DEFAULT: "#16a34a",
+                light: "#dcfce7",
+                dark: "#15803d",
+              },
+              accent: { DEFAULT: "#f59e0b", light: "#fef3c7" },
+            },
+          },
+        },
+      };
+    </script>
+
+  </head>
+  <body>
+    <!-- ========== TOAST ========== -->
+    <div id="toast" class="toast"></div>
+
+    <!-- ========== MODAL ========== -->
+    <div id="modal-overlay" class="modal-overlay" onclick="closeModal(event)">
+      <div id="modal-box" class="modal" onclick="event.stopPropagation()"></div>
+    </div>
+
+    <!-- ========== LOGIN PAGE ========== -->
+    <div
+      id="page-login"
+      class="page active"
+      style="
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(
+          135deg,
+          #f0fdf4 0%,
+          #f8fafc 60%,
+          #fef3c7 100%
+        );
+      "
+    >
+      <div
+        style="
+          background: #fff;
+          border-radius: 24px;
+          padding: 40px 32px;
+          max-width: 440px;
+          width: 90%;
+          box-shadow: 0 8px 40px rgba(0, 0, 0, 0.1);
+        "
+      >
+        <div style="text-align: center; margin-bottom: 32px">
+          <div
+            style="
+              width: 60px;
+              height: 60px;
+              background: #dcfce7;
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              margin: 0 auto 16px;
+            "
+          >
+            <svg
+              width="28"
+              height="28"
+              fill="none"
+              stroke="#16a34a"
+              stroke-width="2.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              viewBox="0 0 24 24"
+            >
+              <circle cx="9" cy="21" r="1" />
+              <circle cx="20" cy="21" r="1" />
+              <path
+                d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"
+              />
+            </svg>
+          </div>
+          <h1
+            style="
+              font-size: 26px;
+              font-weight: 700;
+              color: #1e293b;
+              margin: 0 0 6px;
+            "
+          >
+            Welcome to CartShare
+          </h1>
+          <p style="color: #64748b; font-size: 15px; margin: 0">
+            Select an account to continue
+          </p>
+        </div>
+        <div
+          id="user-list"
+          style="display: flex; flex-direction: column; gap: 10px"
+        ></div>
+        <div
+          style="display: flex; align-items: center; gap: 12px; margin: 20px 0"
+        >
+          <hr style="flex: 1; border: none; border-top: 1px solid #e2e8f0" />
+          <span style="color: #94a3b8; font-size: 13px">OR</span>
+          <hr style="flex: 1; border: none; border-top: 1px solid #e2e8f0" />
+        </div>
+        <button
+          class="btn btn-outline"
+          style="width: 100%; justify-content: center; padding: 12px"
+          onclick="loginAs(null)"
+        >
+          Continue as Guest
+        </button>
+      </div>
+    </div>
+
+    <!-- ========== MAIN APP ========== -->
+    <div id="page-app" class="page" style="display: none">
+      <!-- Mobile header -->
+      <div
+        id="mobile-header"
+        style="
+          background: #fff;
+          border-bottom: 1px solid #e2e8f0;
+          padding: 12px 16px;
+          align-items: center;
+          justify-content: space-between;
+          position: sticky;
+          top: 0;
+          z-index: 100;
+        "
+      >
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            color: #16a34a;
+            font-size: 17px;
+          "
+        >
+          <svg
+            width="22"
+            height="22"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            viewBox="0 0 24 24"
+          >
+            <circle cx="9" cy="21" r="1" />
+            <circle cx="20" cy="21" r="1" />
+            <path
+              d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"
+            />
+          </svg>
+          CartShare
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="toggleMobileNav()">
+          ☰
+        </button>
+      </div>
+
+      <div style="display: flex; min-height: 100vh">
+        <!-- Sidebar -->
+        <div
+          id="sidebar"
+          style="
+            width: 240px;
+            background: #fff;
+            border-right: 1px solid #e2e8f0;
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            flex-shrink: 0;
+          "
+        >
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              font-weight: 700;
+              color: #16a34a;
+              font-size: 19px;
+              padding: 4px 10px 20px;
+            "
+          >
+            <svg
+              width="22"
+              height="22"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              viewBox="0 0 24 24"
+            >
+              <circle cx="9" cy="21" r="1" />
+              <circle cx="20" cy="21" r="1" />
+              <path
+                d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"
+              />
+            </svg>
+            CartShare
+          </div>
+
+          <div
+            id="user-chip"
+            style="
+              background: #f0fdf4;
+              border-radius: 12px;
+              padding: 10px 12px;
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              margin-bottom: 12px;
+            "
+          >
+            <div
+              style="
+                width: 32px;
+                height: 32px;
+                background: #16a34a;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #fff;
+                font-weight: 700;
+                font-size: 14px;
+              "
+              id="user-avatar"
+            >
+              ?
+            </div>
+            <div style="flex: 1; min-width: 0">
+              <div
+                style="font-weight: 600; font-size: 14px; color: #1e293b"
+                id="user-chip-name"
+              >
+                Guest
+              </div>
+              <div id="user-chip-badge"></div>
+            </div>
+          </div>
+
+          <a
+            class="sidebar-link active"
+            id="nav-dashboard"
+            onclick="showView('dashboard')"
+          >
+            <svg
+              width="18"
+              height="18"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              viewBox="0 0 24 24"
+            >
+              <rect x="3" y="3" width="7" height="7" />
+              <rect x="14" y="3" width="7" height="7" />
+              <rect x="3" y="14" width="7" height="7" />
+              <rect x="14" y="14" width="7" height="7" />
+            </svg>
+            Dashboard
+          </a>
+          <a
+            class="sidebar-link"
+            id="nav-categories"
+            onclick="showView('categories')"
+          >
+            <svg
+              width="18"
+              height="18"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              viewBox="0 0 24 24"
+            >
+              <path d="M4 6h16M4 12h16M4 18h7" />
+            </svg>
+            Categories
+          </a>
+          <a class="sidebar-link" id="nav-create" onclick="showView('create')">
+            <svg
+              width="18"
+              height="18"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              viewBox="0 0 24 24"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="16" />
+              <line x1="8" y1="12" x2="16" y2="12" />
+            </svg>
+            New List
+          </a>
+          <a
+            class="sidebar-link"
+            id="nav-manager"
+            onclick="showView('manager')"
+            style="display: none"
+          >
+            <svg
+              width="18"
+              height="18"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              viewBox="0 0 24 24"
+            >
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>
+            Manager Dashboard
+          </a>
+          <a
+            class="sidebar-link"
+            id="nav-admin"
+            onclick="showView('admin')"
+            style="display: none"
+          >
+            <svg
+              width="18"
+              height="18"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              viewBox="0 0 24 24"
+            >
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              <path d="M9 12l2 2 4-4" />
+            </svg>
+            Admin Panel
+          </a>
+
+          <div style="flex: 1"></div>
+          <a
+            class="sidebar-link"
+            onclick="logout()"
+            style="color: #ef4444; margin-top: 8px"
+          >
+            <svg
+              width="18"
+              height="18"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              viewBox="0 0 24 24"
+            >
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+            Sign Out
+          </a>
+        </div>
+
+        <!-- Main content -->
+        <div
+          style="
+            flex: 1;
+            padding: 32px;
+            max-width: 900px;
+            width: 100%;
+            overflow-x: hidden;
+          "
+          id="main-content"
+        >
+          <!-- DASHBOARD VIEW -->
+          <div id="view-dashboard" class="view">
+            <div style="margin-bottom: 28px">
+              <h1
+                style="
+                  font-size: 28px;
+                  font-weight: 700;
+                  color: #1e293b;
+                  margin: 0 0 6px;
+                "
+              >
+                Welcome to CartShare
+              </h1>
+              <p style="color: #64748b; font-size: 16px; margin: 0">
+                Here's what's happening with your groceries.
+              </p>
+            </div>
+
+            <div
+              style="
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 16px;
+                margin-bottom: 32px;
+              "
+              id="stats-row"
+            >
+              <div class="stat-card">
+                <div
+                  style="
+                    font-size: 12px;
+                    font-weight: 600;
+                    color: #16a34a;
+                    text-transform: uppercase;
+                    letter-spacing: 0.06em;
+                    margin-bottom: 8px;
+                  "
+                >
+                  Total Lists
+                </div>
+                <div
+                  style="font-size: 32px; font-weight: 700; color: #16a34a"
+                  id="stat-lists"
+                >
+                  0
+                </div>
+                <div
+                  style="font-size: 12px; color: #86efac; margin-top: 2px"
+                  id="stat-lists-sub"
+                ></div>
+              </div>
+              <div class="stat-card">
+                <div
+                  style="
+                    font-size: 12px;
+                    font-weight: 600;
+                    color: #374151;
+                    text-transform: uppercase;
+                    letter-spacing: 0.06em;
+                    margin-bottom: 8px;
+                  "
+                >
+                  Items Checked
+                </div>
+                <div
+                  style="font-size: 32px; font-weight: 700; color: #374151"
+                  id="stat-checked"
+                >
+                  0
+                </div>
+                <div
+                  style="font-size: 12px; color: #9ca3af; margin-top: 2px"
+                  id="stat-checked-sub"
+                ></div>
+              </div>
+              <div class="stat-card">
+                <div
+                  style="
+                    font-size: 12px;
+                    font-weight: 600;
+                    color: #3b82f6;
+                    text-transform: uppercase;
+                    letter-spacing: 0.06em;
+                    margin-bottom: 8px;
+                  "
+                >
+                  Pending Items
+                </div>
+                <div
+                  style="font-size: 32px; font-weight: 700; color: #3b82f6"
+                  id="stat-pending"
+                >
+                  0
+                </div>
+                <div style="font-size: 12px; color: #93c5fd; margin-top: 2px">
+                  awaiting approval
+                </div>
+              </div>
+            </div>
+
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 16px;
+              "
+            >
+              <h2
+                style="
+                  font-size: 18px;
+                  font-weight: 600;
+                  color: #1e293b;
+                  margin: 0;
+                "
+              >
+                Your Lists
+              </h2>
+              <button
+                class="btn btn-primary btn-sm"
+                onclick="showView('create')"
+              >
+                + Create New
+              </button>
+            </div>
+            <div
+              id="lists-grid"
+              style="
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+                gap: 16px;
+              "
+            ></div>
+          </div>
+
+          <!-- LIST DETAIL VIEW -->
+          <div id="view-list" class="view" style="display: none">
+            <button
+              class="btn btn-ghost btn-sm"
+              style="margin-bottom: 20px"
+              onclick="showView('dashboard')"
+            >
+              ← Back
+            </button>
+            <div
+              id="list-detail-header"
+              class="card"
+              style="margin-bottom: 24px"
+            ></div>
+
+            <div
+              style="
+                position: sticky;
+                top: 0;
+                background: #f8fafc;
+                padding: 12px 0;
+                margin-bottom: 16px;
+                z-index: 10;
+              "
+            >
+              <div style="display: flex; gap: 8px">
+                <input
+                  id="new-item-input"
+                  class="input"
+                  placeholder="Add an item… (e.g. Milk)"
+                  style="height: 48px; font-size: 16px"
+                  onkeydown="if(event.key==='Enter')addItem()"
+                />
+                <button
+                  class="btn btn-primary"
+                  style="height: 48px; padding: 0 24px"
+                  onclick="addItem()"
+                >
+                  <svg
+                    width="18"
+                    height="18"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    viewBox="0 0 24 24"
+                  >
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                  </svg>
+                  Add
+                </button>
+              </div>
+            </div>
+
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 16px;
+              "
+            >
+              <div class="tab-bar" id="filter-bar">
+                <button class="tab active" onclick="setFilter('all',this)">
+                  All
+                </button>
+                <button class="tab" onclick="setFilter('active',this)">
+                  Need to buy
+                </button>
+                <button class="tab" onclick="setFilter('completed',this)">
+                  Got it
+                </button>
+              </div>
+              <button
+                id="clear-checked-btn"
+                class="btn btn-ghost btn-sm"
+                style="color: #ef4444; display: none"
+                onclick="clearChecked()"
+              >
+                Clear completed
+              </button>
+            </div>
+
+            <div id="items-container"></div>
+          </div>
+
+          <!-- CATEGORIES VIEW -->
+          <div id="view-categories" class="view" style="display: none">
+            <div style="margin-bottom: 24px">
+              <h1
+                style="
+                  font-size: 28px;
+                  font-weight: 700;
+                  color: #1e293b;
+                  margin: 0 0 6px;
+                "
+              >
+                Categories
+              </h1>
+              <p style="color: #64748b; margin: 0">
+                Organize your items by category.
+              </p>
+            </div>
+            <div class="card" style="margin-bottom: 20px">
+              <h3 style="font-size: 15px; font-weight: 600; margin: 0 0 14px">
+                Add Category
+              </h3>
+              <div style="display: flex; gap: 8px">
+                <input
+                  id="cat-input"
+                  class="input"
+                  placeholder="Category name…"
+                />
+                <button class="btn btn-primary" onclick="addCategory()">
+                  Add
+                </button>
+              </div>
+            </div>
+            <div class="card">
+              <h3 style="font-size: 15px; font-weight: 600; margin: 0 0 14px">
+                All Categories
+              </h3>
+              <div id="cat-list"></div>
+            </div>
+          </div>
+
+          <!-- CREATE LIST VIEW -->
+          <div id="view-create" class="view" style="display: none">
+            <div style="margin-bottom: 24px">
+              <h1
+                style="
+                  font-size: 28px;
+                  font-weight: 700;
+                  color: #1e293b;
+                  margin: 0 0 6px;
+                "
+              >
+                Create New List
+              </h1>
+              <p style="color: #64748b; margin: 0">
+                Start a new shared grocery list.
+              </p>
+            </div>
+            <div class="card" style="max-width: 520px">
+              <div style="display: flex; flex-direction: column; gap: 16px">
+                <div>
+                  <label
+                    style="
+                      font-size: 13px;
+                      font-weight: 600;
+                      color: #374151;
+                      display: block;
+                      margin-bottom: 6px;
+                    "
+                    >List Name *</label
+                  >
+                  <input
+                    id="create-name"
+                    class="input"
+                    placeholder="e.g. Weekly Groceries"
+                  />
+                </div>
+                <div>
+                  <label
+                    style="
+                      font-size: 13px;
+                      font-weight: 600;
+                      color: #374151;
+                      display: block;
+                      margin-bottom: 6px;
+                    "
+                    >Description</label
+                  >
+                  <input
+                    id="create-desc"
+                    class="input"
+                    placeholder="Optional description"
+                  />
+                </div>
+                <div>
+                  <label
+                    style="
+                      font-size: 13px;
+                      font-weight: 600;
+                      color: #374151;
+                      display: block;
+                      margin-bottom: 8px;
+                    "
+                    >Icon</label
+                  >
+                  <div
+                    style="display: flex; gap: 8px; flex-wrap: wrap"
+                    id="icon-picker"
+                  >
+                    <button
+                      class="btn btn-outline btn-sm icon-btn active"
+                      data-icon="🛒"
+                      onclick="pickIcon(this,'🛒')"
+                    >
+                      🛒
+                    </button>
+                    <button
+                      class="btn btn-outline btn-sm icon-btn"
+                      data-icon="🍎"
+                      onclick="pickIcon(this,'🍎')"
+                    >
+                      🍎
+                    </button>
+                    <button
+                      class="btn btn-outline btn-sm icon-btn"
+                      data-icon="🥩"
+                      onclick="pickIcon(this,'🥩')"
+                    >
+                      🥩
+                    </button>
+                    <button
+                      class="btn btn-outline btn-sm icon-btn"
+                      data-icon="🥗"
+                      onclick="pickIcon(this,'🥗')"
+                    >
+                      🥗
+                    </button>
+                    <button
+                      class="btn btn-outline btn-sm icon-btn"
+                      data-icon="🧴"
+                      onclick="pickIcon(this,'🧴')"
+                    >
+                      🧴
+                    </button>
+                    <button
+                      class="btn btn-outline btn-sm icon-btn"
+                      data-icon="🏠"
+                      onclick="pickIcon(this,'🏠')"
+                    >
+                      🏠
+                    </button>
+                    <button
+                      class="btn btn-outline btn-sm icon-btn"
+                      data-icon="🎉"
+                      onclick="pickIcon(this,'🎉')"
+                    >
+                      🎉
+                    </button>
+                    <button
+                      class="btn btn-outline btn-sm icon-btn"
+                      data-icon="☕"
+                      onclick="pickIcon(this,'☕')"
+                    >
+                      ☕
+                    </button>
+                  </div>
+                </div>
+                <button
+                  class="btn btn-primary"
+                  style="margin-top: 8px"
+                  onclick="createList()"
+                >
+                  Create List
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- MANAGER DASHBOARD VIEW -->
+          <div id="view-manager" class="view" style="display: none">
+            <div style="margin-bottom: 24px">
+              <h1
+                style="
+                  font-size: 28px;
+                  font-weight: 700;
+                  color: #1e293b;
+                  margin: 0 0 6px;
+                "
+              >
+                Manager Dashboard
+              </h1>
+              <p style="color: #64748b; margin: 0">
+                Review and manage item requests.
+              </p>
+            </div>
+            <div class="tab-bar" style="margin-bottom: 20px" id="manager-tabs">
+              <button
+                class="tab active"
+                onclick="setManagerTab('pending',this)"
+              >
+                Pending
+              </button>
+              <button class="tab" onclick="setManagerTab('approved',this)">
+                Approved
+              </button>
+              <button class="tab" onclick="setManagerTab('rejected',this)">
+                Rejected
+              </button>
+            </div>
+            <div class="card">
+              <div id="manager-items-list"></div>
+            </div>
+          </div>
+
+          <!-- ADMIN PANEL VIEW -->
+          <div id="view-admin" class="view" style="display: none">
+            <div style="margin-bottom: 24px">
+              <h1
+                style="
+                  font-size: 28px;
+                  font-weight: 700;
+                  color: #1e293b;
+                  display: flex;
+                  align-items: center;
+                  gap: 10px;
+                  margin: 0 0 6px;
+                "
+              >
+                <svg
+                  width="28"
+                  height="28"
+                  fill="none"
+                  stroke="#16a34a"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+                Admin Panel
+              </h1>
+              <p style="color: #64748b; margin: 0">
+                Manage users and their roles.
+              </p>
+            </div>
+            <div class="card" style="margin-bottom: 20px">
+              <h3 style="font-size: 15px; font-weight: 600; margin: 0 0 16px">
+                Add New User
+              </h3>
+              <div
+                style="
+                  display: flex;
+                  gap: 10px;
+                  align-items: center;
+                  flex-wrap: wrap;
+                "
+              >
+                <input
+                  id="admin-new-name"
+                  class="input"
+                  placeholder="User name"
+                  style="max-width: 220px"
+                />
+                <select id="admin-new-role" class="select">
+                  <option value="user">User</option>
+                  <option value="manager">Manager</option>
+                  <option value="admin">Admin</option>
+                </select>
+                <button class="btn btn-primary" onclick="adminAddUser()">
+                  <svg
+                    width="16"
+                    height="16"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <line x1="19" y1="8" x2="19" y2="14" />
+                    <line x1="22" y1="11" x2="16" y2="11" />
+                  </svg>
+                  Add User
+                </button>
+              </div>
+            </div>
+            <div class="card">
+              <h3 style="font-size: 15px; font-weight: 600; margin: 0 0 16px">
+                Manage Users
+              </h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Role</th>
+                    <th>Joined</th>
+                    <th style="text-align: right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-users-table"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+ <script src="cartsharre.js"></script>
+  </body>
+</html>

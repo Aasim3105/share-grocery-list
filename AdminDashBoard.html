@@ -1,0 +1,1948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>GrocerHub – Smart Grocery Management</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --primary: #2E7D32;
+    --primary-mid: #388E3C;
+    --primary-light: #4CAF50;
+    --primary-pale: #E8F5E9;
+    --accent: #FF6F00;
+    --accent-light: #FFF3E0;
+    --danger: #C62828;
+    --danger-light: #FFEBEE;
+    --info: #1565C0;
+    --info-light: #E3F2FD;
+    --warn: #F57F17;
+    --warn-light: #FFF9C4;
+    --purple: #6A1B9A;
+    --purple-light: #F3E5F5;
+    --bg: #F0F4F0;
+    --card: #FFFFFF;
+    --border: #E0E0E0;
+    --text: #1B2E1C;
+    --muted: #6B7C6B;
+    --sidebar: #162117;
+    --sidebar-hover: rgba(76,175,80,0.12);
+    --sidebar-active-bg: rgba(76,175,80,0.18);
+    --sidebar-active-border: #4CAF50;
+    --sidebar-active-text: #81C784;
+    --topbar-h: 56px;
+    --sidebar-w: 220px;
+  }
+
+  html, body {
+    height: 100%;
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* ========= LAYOUT ========= */
+  .app-shell { display: flex; height: 100vh; overflow: hidden; }
+
+  /* ========= SIDEBAR ========= */
+  .sidebar {
+    width: var(--sidebar-w);
+    background: var(--sidebar);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .sidebar-logo {
+    padding: 22px 18px 18px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+  .sidebar-logo .logo-name {
+    font-family: 'Nunito', sans-serif;
+    font-size: 18px;
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: -0.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .sidebar-logo .logo-name span { font-size: 20px; }
+  .sidebar-logo .logo-sub {
+    font-size: 10px;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .nav-group-label {
+    padding: 18px 18px 5px;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.28);
+    font-weight: 700;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 18px;
+    cursor: pointer;
+    color: rgba(255,255,255,0.55);
+    font-size: 13px;
+    font-weight: 500;
+    border-left: 2px solid transparent;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    user-select: none;
+    position: relative;
+  }
+  .nav-item:hover { background: var(--sidebar-hover); color: rgba(255,255,255,0.9); }
+  .nav-item.active {
+    background: var(--sidebar-active-bg);
+    color: var(--sidebar-active-text);
+    border-left-color: var(--sidebar-active-border);
+  }
+  .nav-item svg { width: 15px; height: 15px; flex-shrink: 0; }
+  .nav-item .badge-count {
+    margin-left: auto;
+    background: var(--danger);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    border-radius: 10px;
+    padding: 1px 6px;
+  }
+
+  /* ========= MAIN CONTENT ========= */
+  .main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-width: 0;
+  }
+
+  /* ========= TOPBAR ========= */
+  .topbar {
+    height: var(--topbar-h);
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    flex-shrink: 0;
+    gap: 16px;
+  }
+  .topbar-left { display: flex; flex-direction: column; }
+  .topbar-panel-name {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .topbar-page-title {
+    font-family: 'Nunito', sans-serif;
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1.2;
+  }
+  .topbar-right { display: flex; align-items: center; gap: 12px; }
+  .topbar-search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 12px;
+    min-width: 200px;
+  }
+  .topbar-search input {
+    border: none;
+    background: transparent;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    outline: none;
+    width: 100%;
+  }
+  .topbar-search input::placeholder { color: var(--muted); }
+  .topbar-user-info {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    cursor: pointer;
+    padding: 6px 10px;
+    border-radius: 8px;
+    transition: background 0.15s;
+  }
+  .topbar-user-info:hover { background: var(--bg); }
+  .topbar-user-name { font-size: 13px; font-weight: 600; }
+  .topbar-user-role { font-size: 10px; color: var(--muted); }
+
+  /* ========= PAGE BODY ========= */
+  .page-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+  }
+
+  /* ========= PANELS (show/hide) ========= */
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* ========= STAT CARDS GRID ========= */
+  .stats-grid {
+    display: grid;
+    gap: 14px;
+    margin-bottom: 22px;
+  }
+  .stats-grid-4 { grid-template-columns: repeat(4, 1fr); }
+  .stats-grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .stats-grid-2 { grid-template-columns: repeat(2, 1fr); }
+
+  .stat-card {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 16px 18px;
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 100%;
+    border-radius: 12px 0 0 12px;
+  }
+  .stat-card.green::before { background: var(--primary-light); }
+  .stat-card.blue::before { background: #42A5F5; }
+  .stat-card.orange::before { background: #FFA726; }
+  .stat-card.red::before { background: #EF5350; }
+  .stat-card.purple::before { background: #AB47BC; }
+
+  .stat-card .s-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+  }
+  .stat-card .s-value {
+    font-family: 'Nunito', sans-serif;
+    font-size: 28px;
+    font-weight: 900;
+    margin: 2px 0 3px;
+    line-height: 1.1;
+  }
+  .stat-card .s-change {
+    font-size: 11px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+  .stat-card.green .s-value { color: var(--primary); }
+  .stat-card.blue .s-value { color: var(--info); }
+  .stat-card.orange .s-value { color: var(--accent); }
+  .stat-card.red .s-value { color: var(--danger); }
+  .stat-card.purple .s-value { color: var(--purple); }
+  .stat-card.green .s-change { color: var(--primary); }
+  .stat-card.blue .s-change { color: var(--info); }
+  .stat-card.orange .s-change { color: var(--accent); }
+  .stat-card.red .s-change { color: var(--danger); }
+  .stat-card .s-icon {
+    position: absolute;
+    top: 14px; right: 14px;
+    font-size: 22px;
+    opacity: 0.15;
+  }
+
+  /* ========= CARD ========= */
+  .card {
+    background: var(--card);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    margin-bottom: 18px;
+    overflow: hidden;
+  }
+  .card-head {
+    padding: 16px 18px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .card-head h3 {
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--text);
+  }
+  .card-head .card-subtitle {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 1px;
+  }
+  .card-body { padding: 16px 18px; }
+  .card-body-nopad { padding: 0; }
+
+  /* ========= TWO/THREE COL GRID ========= */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; margin-bottom: 18px; }
+  .col-6-4 { display: grid; grid-template-columns: 1.5fr 1fr; gap: 18px; margin-bottom: 18px; }
+
+  /* ========= TABLE ========= */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .data-table thead tr {
+    border-bottom: 1px solid var(--border);
+    background: #FAFAFA;
+  }
+  .data-table th {
+    text-align: left;
+    padding: 10px 14px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .data-table td {
+    padding: 11px 14px;
+    border-bottom: 1px solid #F5F5F5;
+    vertical-align: middle;
+  }
+  .data-table tbody tr:last-child td { border-bottom: none; }
+  .data-table tbody tr:hover { background: #FAFFF8; }
+
+  /* ========= BADGES ========= */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .badge-green { background: var(--primary-pale); color: var(--primary); }
+  .badge-orange { background: var(--accent-light); color: var(--accent); }
+  .badge-red { background: var(--danger-light); color: var(--danger); }
+  .badge-blue { background: var(--info-light); color: var(--info); }
+  .badge-warn { background: var(--warn-light); color: var(--warn); }
+  .badge-purple { background: var(--purple-light); color: var(--purple); }
+  .badge-gray { background: #EEEEEE; color: #555; }
+
+  /* ========= BUTTONS ========= */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-primary:hover { background: #256427; }
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  .btn-outline:hover { background: var(--bg); }
+  .btn-danger { background: var(--danger-light); color: var(--danger); border: 1px solid #FFCDD2; }
+  .btn-danger:hover { background: #FFCDD2; }
+  .btn-warn { background: var(--warn-light); color: var(--warn); border: 1px solid #FFECB3; }
+  .btn-info { background: var(--info-light); color: var(--info); border: 1px solid #BBDEFB; }
+  .btn-sm { padding: 5px 11px; font-size: 12px; border-radius: 6px; }
+  .btn-xs { padding: 3px 8px; font-size: 11px; border-radius: 5px; }
+
+  /* ========= AVATAR ========= */
+  .avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .avatar-lg { width: 42px; height: 42px; font-size: 14px; }
+  .avatar-sm { width: 24px; height: 24px; font-size: 9px; }
+
+  /* ========= PROGRESS BAR ========= */
+  .progress-wrap { height: 6px; background: #EEEEEE; border-radius: 3px; overflow: hidden; }
+  .progress-bar { height: 100%; border-radius: 3px; transition: width 0.4s ease; }
+  .progress-green { background: var(--primary-light); }
+  .progress-orange { background: #FFA726; }
+  .progress-red { background: #EF5350; }
+
+  /* ========= MINI BAR CHART ========= */
+  .mini-barchart {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    height: 60px;
+  }
+  .mini-barchart .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+  .mini-barchart .bar-fill {
+    width: 100%;
+    border-radius: 3px 3px 0 0;
+    background: var(--primary-pale);
+    transition: height 0.4s;
+  }
+  .mini-barchart .bar-fill.hl { background: var(--primary-light); }
+  .mini-barchart .bar-label { font-size: 9px; color: var(--muted); }
+
+  /* ========= ACTIVITY FEED ========= */
+  .activity-list { display: flex; flex-direction: column; gap: 0; }
+  .activity-item {
+    display: flex;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid #F5F5F5;
+    align-items: flex-start;
+  }
+  .activity-item:last-child { border-bottom: none; }
+  .activity-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+  .activity-text { font-size: 12px; line-height: 1.5; flex: 1; }
+  .activity-text b { font-weight: 600; }
+  .activity-time { font-size: 11px; color: var(--muted); }
+
+  /* ========= USER ROW ========= */
+  .user-cell { display: flex; align-items: center; gap: 9px; }
+  .user-cell .u-name { font-size: 13px; font-weight: 600; }
+  .user-cell .u-email { font-size: 11px; color: var(--muted); }
+
+  /* ========= GROCERY LIST ITEMS ========= */
+  .grocery-list { display: flex; flex-direction: column; }
+  .g-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 18px;
+    border-bottom: 1px solid #F5F5F5;
+    cursor: pointer;
+    transition: background 0.1s;
+  }
+  .g-item:last-child { border-bottom: none; }
+  .g-item:hover { background: #FAFFF8; }
+  .g-checkbox {
+    width: 20px; height: 20px;
+    border-radius: 5px;
+    border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.15s;
+    font-size: 12px;
+    color: transparent;
+  }
+  .g-item.checked .g-checkbox {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+  }
+  .g-icon {
+    width: 38px; height: 38px;
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+    transition: opacity 0.15s;
+  }
+  .g-item.checked .g-icon { opacity: 0.45; }
+  .g-info { flex: 1; }
+  .g-name { font-size: 13px; font-weight: 600; }
+  .g-sub { font-size: 11px; color: var(--muted); }
+  .g-item.checked .g-name { text-decoration: line-through; color: var(--muted); }
+  .g-qty { font-size: 13px; font-weight: 700; color: var(--primary); white-space: nowrap; }
+  .g-item.checked .g-qty { text-decoration: line-through; color: var(--muted); }
+  .g-substitute { font-size: 10px; color: var(--info); font-weight: 600; }
+
+  /* ========= LIST BOTTOM BAR ========= */
+  .list-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-top: 1px solid var(--border);
+    background: #FAFFF8;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .list-bottom .lb-group { display: flex; flex-direction: column; }
+  .list-bottom .lb-label { font-size: 11px; color: var(--muted); font-weight: 600; }
+  .list-bottom .lb-value { font-family: 'Nunito', sans-serif; font-size: 17px; font-weight: 900; }
+
+  /* ========= FORM ELEMENTS ========= */
+  .form-group { margin-bottom: 14px; }
+  .form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .form-control {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    background: var(--card);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .form-control:focus { border-color: var(--primary); }
+  .form-row { display: grid; gap: 12px; }
+  .form-row-2 { grid-template-columns: 1fr 1fr; }
+  .form-row-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+  /* ========= SECTION TABS ========= */
+  .section-tabs { display: flex; gap: 5px; margin-bottom: 16px; flex-wrap: wrap; }
+  .s-tab {
+    padding: 6px 15px;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .s-tab:hover { background: var(--primary-pale); color: var(--primary); border-color: #C8E6C9; }
+  .s-tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+  /* ========= PAGE SECTION HEADER ========= */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .section-header h2 {
+    font-family: 'Nunito', sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+  }
+
+  /* ========= SEARCH ========= */
+  .inline-search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 13px;
+  }
+  .inline-search input {
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    width: 220px;
+  }
+  .inline-search input::placeholder { color: var(--muted); }
+
+  /* ========= NOTIFICATION BELL ========= */
+  .notif-btn {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    position: relative;
+    transition: background 0.15s;
+  }
+  .notif-btn:hover { background: var(--primary-pale); }
+  .notif-btn .dot {
+    position: absolute;
+    top: 7px; right: 7px;
+    width: 7px; height: 7px;
+    background: var(--danger);
+    border-radius: 50%;
+    border: 1.5px solid var(--card);
+  }
+
+  /* ========= MODAL OVERLAY ========= */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-box {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 24px;
+    width: 460px;
+    max-width: 95vw;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  }
+  .modal-head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 18px;
+  }
+  .modal-head h3 {
+    font-family: 'Nunito', sans-serif;
+    font-size: 17px; font-weight: 800;
+  }
+  .modal-close {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--muted);
+  }
+  .modal-footer { margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end; }
+
+  /* ========= SUMMARY BOX ========= */
+  .summary-box {
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 14px;
+  }
+  .summary-box .sb-icon { font-size: 26px; }
+  .summary-box .sb-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+  .summary-box .sb-value { font-family: 'Nunito', sans-serif; font-size: 20px; font-weight: 900; }
+
+  /* ========= CHART BAR HORIZONTAL ========= */
+  .h-bar-row { margin-bottom: 12px; }
+  .h-bar-row .hb-header { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; margin-bottom: 5px; }
+  .h-bar-row .hb-pct { color: var(--muted); font-weight: 500; font-size: 12px; }
+
+  /* ========= SCROLLBAR ========= */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #C8E6C9; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #A5D6A7; }
+
+  /* ========= TOOLTIP ========= */
+  .tooltip-wrap { position: relative; display: inline-flex; }
+  .tooltip-wrap:hover .tooltip-text { display: block; }
+  .tooltip-text {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 5px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1B2E1C;
+    color: #fff;
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: 5px;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 50;
+  }
+
+  /* ========= ACTION BAR ========= */
+  .action-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  /* ========= ORDER TRACKING STEPS ========= */
+  .order-steps { display: flex; align-items: center; gap: 0; margin: 16px 0; }
+  .o-step { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; position: relative; }
+  .o-step-dot {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    z-index: 1;
+    position: relative;
+  }
+  .o-step.done .o-step-dot { background: var(--primary); border-color: var(--primary); color: #fff; }
+  .o-step.active .o-step-dot { background: var(--accent-light); border-color: var(--accent); color: var(--accent); }
+  .o-step-label { font-size: 10px; font-weight: 600; color: var(--muted); text-align: center; }
+  .o-step.done .o-step-label { color: var(--primary); }
+  .o-step.active .o-step-label { color: var(--accent); }
+  .o-step-line {
+    flex: 1;
+    height: 2px;
+    background: var(--border);
+    margin-top: -18px;
+  }
+  .o-step-line.done { background: var(--primary-light); }
+
+  /* ========= QUICK ADD ITEM ========= */
+  .quick-add {
+    display: flex;
+    gap: 8px;
+    padding: 12px 18px;
+    border-top: 1px solid var(--border);
+    background: var(--bg);
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .quick-add input, .quick-add select {
+    flex: 1;
+    min-width: 100px;
+    padding: 8px 11px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    background: var(--card);
+    outline: none;
+  }
+  .quick-add input:focus, .quick-add select:focus { border-color: var(--primary); }
+
+  /* ========= RESPONSIVE ========= */
+  @media (max-width: 900px) {
+    .stats-grid-4 { grid-template-columns: repeat(2, 1fr); }
+    .two-col, .three-col, .col-6-4 { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    .sidebar { display: none; }
+    .stats-grid-4, .stats-grid-3 { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     APP SHELL
+============================================================ -->
+<div class="app-shell">
+
+  <!-- ====== SIDEBAR ====== -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-name"><span>🛒</span> GrocerHub</div>
+      <div class="logo-sub">Management Suite</div>
+    </div>
+
+    <!-- ADMIN -->
+    <div class="nav-group-label">Admin</div>
+    <div class="nav-item active" onclick="navigate('admin-dashboard', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+      Dashboard
+    </div>
+    <div class="nav-item" onclick="navigate('admin-users', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M21 21v-2a4 4 0 0 0-3-3.87"/></svg>
+      Users
+      <span class="badge-count">5</span>
+    </div>
+    <div class="nav-item" onclick="navigate('admin-inventory', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+      Inventory
+    </div>
+    <div class="nav-item" onclick="navigate('admin-settings', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Settings
+    </div>
+
+    <!-- MANAGER -->
+    <div class="nav-group-label">Manager</div>
+    <div class="nav-item" onclick="navigate('manager-lists', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      All Lists
+      <span class="badge-count">3</span>
+    </div>
+    <div class="nav-item" onclick="navigate('manager-orders', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      Orders
+    </div>
+    <div class="nav-item" onclick="navigate('manager-reports', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Reports
+    </div>
+    <div class="nav-item" onclick="navigate('manager-approval', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      Approvals
+      <span class="badge-count">2</span>
+    </div>
+
+    <!-- USER -->
+    <div class="nav-group-label">User</div>
+    <div class="nav-item" onclick="navigate('user-list', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      My Grocery List
+    </div>
+    <div class="nav-item" onclick="navigate('user-history', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Order History
+    </div>
+    <div class="nav-item" onclick="navigate('user-profile', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      My Profile
+    </div>
+  </aside>
+
+  <!-- ====== MAIN CONTENT ====== -->
+  <div class="main-content">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <div class="topbar-panel-name" id="topbar-panel-name">Admin Panel</div>
+        <div class="topbar-page-title" id="topbar-page-title">Dashboard</div>
+      </div>
+      <div class="topbar-right">
+        <div class="inline-search">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" placeholder="Search anything…" />
+        </div>
+        <div class="notif-btn" title="Notifications">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <div class="dot"></div>
+        </div>
+        <div class="topbar-user-info" id="topbar-user">
+          <div class="avatar" style="background:#E8F5E9;color:#2E7D32" id="topbar-avatar">SA</div>
+          <div>
+            <div class="topbar-user-name" id="topbar-uname">Super Admin</div>
+            <div class="topbar-user-role" id="topbar-urole">Administrator</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE BODY -->
+    <div class="page-body">
+
+      <!-- =====================================================
+           ADMIN: DASHBOARD
+      ===================================================== -->
+      <div class="panel active" id="panel-admin-dashboard">
+        <div class="stats-grid stats-grid-4">
+          <div class="stat-card green">
+            <div class="s-icon">👥</div>
+            <div class="s-label">Total Users</div>
+            <div class="s-value">2,841</div>
+            <div class="s-change">↑ 12% this month</div>
+          </div>
+          <div class="stat-card blue">
+            <div class="s-icon">📋</div>
+            <div class="s-label">Active Lists</div>
+            <div class="s-value">1,204</div>
+            <div class="s-change">↑ 8% today</div>
+          </div>
+          <div class="stat-card orange">
+            <div class="s-icon">📦</div>
+            <div class="s-label">Items Tracked</div>
+            <div class="s-value">48,320</div>
+            <div class="s-change">↑ 3% this week</div>
+          </div>
+          <div class="stat-card red">
+            <div class="s-icon">⚠️</div>
+            <div class="s-label">Low Stock Alerts</div>
+            <div class="s-value">23</div>
+            <div class="s-change">↑ 5 new today</div>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div class="card">
+            <div class="card-head"><h3>Weekly List Activity</h3><span class="card-subtitle">Lists created per day</span></div>
+            <div class="card-body">
+              <div class="mini-barchart">
+                <div class="bar-col"><div class="bar-fill" style="height:40%"></div><div class="bar-label">Mon</div></div>
+                <div class="bar-col"><div class="bar-fill" style="height:55%"></div><div class="bar-label">Tue</div></div>
+                <div class="bar-col"><div class="bar-fill" style="height:48%"></div><div class="bar-label">Wed</div></div>
+                <div class="bar-col"><div class="bar-fill" style="height:72%"></div><div class="bar-label">Thu</div></div>
+                <div class="bar-col"><div class="bar-fill" style="height:62%"></div><div class="bar-label">Fri</div></div>
+                <div class="bar-col"><div class="bar-fill hl" style="height:88%"></div><div class="bar-label" style="color:var(--primary);font-weight:700">Sat</div></div>
+                <div class="bar-col"><div class="bar-fill" style="height:65%"></div><div class="bar-label">Sun</div></div>
+              </div>
+              <div style="margin-top:12px;display:flex;gap:16px">
+                <div><div style="font-size:11px;color:var(--muted)">This week</div><div style="font-family:'Nunito',sans-serif;font-size:20px;font-weight:900;color:var(--primary)">347</div></div>
+                <div><div style="font-size:11px;color:var(--muted)">Avg/day</div><div style="font-family:'Nunito',sans-serif;font-size:20px;font-weight:900;color:var(--info)">49.6</div></div>
+                <div><div style="font-size:11px;color:var(--muted)">Peak day</div><div style="font-family:'Nunito',sans-serif;font-size:20px;font-weight:900;color:var(--accent)">Sat</div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><h3>Recent Activity</h3></div>
+            <div class="card-body" style="padding-top:8px">
+              <div class="activity-list">
+                <div class="activity-item">
+                  <div class="activity-dot" style="background:#4CAF50"></div>
+                  <div class="activity-text"><b>Sarah K.</b> registered as new user</div>
+                  <div class="activity-time">2m ago</div>
+                </div>
+                <div class="activity-item">
+                  <div class="activity-dot" style="background:#FF6F00"></div>
+                  <div class="activity-text">Inventory alert: <b>Milk</b> critically low</div>
+                  <div class="activity-time">15m ago</div>
+                </div>
+                <div class="activity-item">
+                  <div class="activity-dot" style="background:#1565C0"></div>
+                  <div class="activity-text">Manager <b>Ravi M.</b> approved 3 orders</div>
+                  <div class="activity-time">1h ago</div>
+                </div>
+                <div class="activity-item">
+                  <div class="activity-dot" style="background:#C62828"></div>
+                  <div class="activity-text">Bulk import <b>failed</b> for Store #7</div>
+                  <div class="activity-time">2h ago</div>
+                </div>
+                <div class="activity-item">
+                  <div class="activity-dot" style="background:#4CAF50"></div>
+                  <div class="activity-text">System backup completed <b>successfully</b></div>
+                  <div class="activity-time">3h ago</div>
+                </div>
+                <div class="activity-item">
+                  <div class="activity-dot" style="background:#6A1B9A"></div>
+                  <div class="activity-text">New manager role assigned to <b>Sneha K.</b></div>
+                  <div class="activity-time">5h ago</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-6-4">
+          <div class="card">
+            <div class="card-head"><h3>Top Categories by Orders</h3></div>
+            <div class="card-body">
+              <div class="h-bar-row">
+                <div class="hb-header"><span>🥦 Produce</span><span class="hb-pct">42%</span></div>
+                <div class="progress-wrap"><div class="progress-bar progress-green" style="width:42%"></div></div>
+              </div>
+              <div class="h-bar-row">
+                <div class="hb-header"><span>🥛 Dairy</span><span class="hb-pct">28%</span></div>
+                <div class="progress-wrap"><div class="progress-bar progress-green" style="width:28%"></div></div>
+              </div>
+              <div class="h-bar-row">
+                <div class="hb-header"><span>🍞 Bakery</span><span class="hb-pct">15%</span></div>
+                <div class="progress-wrap"><div class="progress-bar progress-orange" style="width:15%"></div></div>
+              </div>
+              <div class="h-bar-row">
+                <div class="hb-header"><span>🧴 Pantry</span><span class="hb-pct">10%</span></div>
+                <div class="progress-wrap"><div class="progress-bar progress-orange" style="width:10%"></div></div>
+              </div>
+              <div class="h-bar-row" style="margin-bottom:0">
+                <div class="hb-header"><span>🥩 Meat</span><span class="hb-pct">5%</span></div>
+                <div class="progress-wrap"><div class="progress-bar progress-red" style="width:5%"></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h3>System Health</h3></div>
+            <div class="card-body">
+              <div class="summary-box" style="background:var(--primary-pale)">
+                <div class="sb-icon">🟢</div>
+                <div><div class="sb-label" style="color:var(--primary)">Server Status</div><div class="sb-value" style="color:var(--primary)">Online</div></div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--muted)">CPU Usage</span><span style="font-weight:700;color:var(--primary)">34%</span></div>
+                <div class="progress-wrap"><div class="progress-bar progress-green" style="width:34%"></div></div>
+                <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--muted)">Memory</span><span style="font-weight:700;color:var(--accent)">68%</span></div>
+                <div class="progress-wrap"><div class="progress-bar progress-orange" style="width:68%"></div></div>
+                <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--muted)">Storage</span><span style="font-weight:700;color:var(--primary)">41%</span></div>
+                <div class="progress-wrap"><div class="progress-bar progress-green" style="width:41%"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- =====================================================
+           ADMIN: USERS
+      ===================================================== -->
+      <div class="panel" id="panel-admin-users">
+        <div class="action-bar">
+          <div class="inline-search">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" placeholder="Search users by name or email…" id="user-search" oninput="filterUsers()" />
+          </div>
+          <div style="display:flex;gap:8px">
+            <select class="form-control" style="width:140px;padding:7px 10px">
+              <option>All Roles</option>
+              <option>Admin</option>
+              <option>Manager</option>
+              <option>User</option>
+            </select>
+            <button class="btn btn-primary" onclick="document.getElementById('add-user-modal').classList.add('open')">+ Add User</button>
+          </div>
+        </div>
+
+        <div class="stats-grid stats-grid-4" style="margin-bottom:16px">
+          <div class="stat-card green"><div class="s-label">Total Users</div><div class="s-value">2,841</div></div>
+          <div class="stat-card blue"><div class="s-label">Managers</div><div class="s-value">42</div></div>
+          <div class="stat-card orange"><div class="s-label">Active Today</div><div class="s-value">318</div></div>
+          <div class="stat-card red"><div class="s-label">Inactive</div><div class="s-value">74</div></div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>User Directory</h3><span class="card-subtitle">2,841 registered accounts</span></div>
+          <div class="card-body-nopad">
+            <table class="data-table" id="users-table">
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                  <th>Lists</th>
+                  <th>Last Login</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><div class="user-cell"><div class="avatar" style="background:#E3F2FD;color:#1565C0">RM</div><div><div class="u-name">Ravi Mehta</div></div></div></td>
+                  <td style="color:var(--muted);font-size:12px">ravi@example.com</td>
+                  <td><span class="badge badge-blue">Manager</span></td>
+                  <td><span class="badge badge-green">Active</span></td>
+                  <td style="font-weight:700">47</td>
+                  <td style="font-size:12px;color:var(--muted)">Today 10:24</td>
+                  <td><div style="display:flex;gap:5px"><button class="btn btn-outline btn-xs">Edit</button><button class="btn btn-warn btn-xs">Reset PW</button><button class="btn btn-danger btn-xs">Remove</button></div></td>
+                </tr>
+                <tr>
+                  <td><div class="user-cell"><div class="avatar" style="background:#F3E5F5;color:#6A1B9A">PD</div><div><div class="u-name">Priya Desai</div></div></div></td>
+                  <td style="color:var(--muted);font-size:12px">priya@example.com</td>
+                  <td><span class="badge badge-orange">User</span></td>
+                  <td><span class="badge badge-green">Active</span></td>
+                  <td style="font-weight:700">12</td>
+                  <td style="font-size:12px;color:var(--muted)">Today 09:15</td>
+                  <td><div style="display:flex;gap:5px"><button class="btn btn-outline btn-xs">Edit</button><button class="btn btn-warn btn-xs">Reset PW</button><button class="btn btn-danger btn-xs">Remove</button></div></td>
+                </tr>
+                <tr>
+                  <td><div class="user-cell"><div class="avatar" style="background:#FFF3E0;color:#E65100">AK</div><div><div class="u-name">Arjun Kumar</div></div></div></td>
+                  <td style="color:var(--muted);font-size:12px">arjun@example.com</td>
+                  <td><span class="badge badge-orange">User</span></td>
+                  <td><span class="badge badge-warn">Inactive</span></td>
+                  <td style="font-weight:700">3</td>
+                  <td style="font-size:12px;color:var(--muted)">Apr 3, 2026</td>
+                  <td><div style="display:flex;gap:5px"><button class="btn btn-outline btn-xs">Edit</button><button class="btn btn-warn btn-xs">Reset PW</button><button class="btn btn-danger btn-xs">Remove</button></div></td>
+                </tr>
+                <tr>
+                  <td><div class="user-cell"><div class="avatar" style="background:#E8F5E9;color:#1B5E20">SK</div><div><div class="u-name">Sneha Kale</div></div></div></td>
+                  <td style="color:var(--muted);font-size:12px">sneha@example.com</td>
+                  <td><span class="badge badge-blue">Manager</span></td>
+                  <td><span class="badge badge-green">Active</span></td>
+                  <td style="font-weight:700">89</td>
+                  <td style="font-size:12px;color:var(--muted)">Today 11:02</td>
+                  <td><div style="display:flex;gap:5px"><button class="btn btn-outline btn-xs">Edit</button><button class="btn btn-warn btn-xs">Reset PW</button><button class="btn btn-danger btn-xs">Remove</button></div></td>
+                </tr>
+                <tr>
+                  <td><div class="user-cell"><div class="avatar" style="background:#FCE4EC;color:#880E4F">NP</div><div><div class="u-name">Neha Patil</div></div></div></td>
+                  <td style="color:var(--muted);font-size:12px">neha@example.com</td>
+                  <td><span class="badge badge-orange">User</span></td>
+                  <td><span class="badge badge-green">Active</span></td>
+                  <td style="font-weight:700">21</td>
+                  <td style="font-size:12px;color:var(--muted)">Today 08:50</td>
+                  <td><div style="display:flex;gap:5px"><button class="btn btn-outline btn-xs">Edit</button><button class="btn btn-warn btn-xs">Reset PW</button><button class="btn btn-danger btn-xs">Remove</button></div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- =====================================================
+           ADMIN: INVENTORY
+      ===================================================== -->
+      <div class="panel" id="panel-admin-inventory">
+        <div class="stats-grid stats-grid-4" style="margin-bottom:18px">
+          <div class="stat-card green"><div class="s-icon">📦</div><div class="s-label">Total Products</div><div class="s-value">1,480</div></div>
+          <div class="stat-card blue"><div class="s-icon">✅</div><div class="s-label">In Stock</div><div class="s-value">1,450</div></div>
+          <div class="stat-card orange"><div class="s-icon">⚠️</div><div class="s-label">Low Stock</div><div class="s-value">23</div></div>
+          <div class="stat-card red"><div class="s-icon">❌</div><div class="s-label">Out of Stock</div><div class="s-value">7</div></div>
+        </div>
+
+        <div class="action-bar">
+          <div class="inline-search">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" placeholder="Search products…" />
+          </div>
+          <div style="display:flex;gap:8px">
+            <select class="form-control" style="width:140px;padding:7px 10px">
+              <option>All Categories</option>
+              <option>Produce</option>
+              <option>Dairy</option>
+              <option>Pantry</option>
+              <option>Bakery</option>
+            </select>
+            <button class="btn btn-primary">+ Add Product</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>Product Stock Levels</h3><span class="card-subtitle">Click a row to edit</span></div>
+          <div class="card-body-nopad">
+            <table class="data-table">
+              <thead>
+                <tr><th>Product</th><th>Category</th><th>Stock Level</th><th>Units</th><th>Reorder At</th><th>Status</th><th>Actions</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="font-weight:700">🍌 Bananas</td>
+                  <td><span class="badge badge-green">Produce</span></td>
+                  <td><div style="display:flex;align-items:center;gap:8px"><div class="progress-wrap" style="width:100px;flex-shrink:0"><div class="progress-bar progress-green" style="width:85%"></div></div><span style="font-size:11px;color:var(--muted)">85%</span></div></td>
+                  <td style="font-weight:700">340 kg</td>
+                  <td style="font-size:12px;color:var(--muted)">50 kg</td>
+                  <td><span class="badge badge-green">In Stock</span></td>
+                  <td><div style="display:flex;gap:5px"><button class="btn btn-outline btn-xs">Edit</button><button class="btn btn-info btn-xs">Restock</button></div></td>
+                </tr>
+                <tr>
+                  <td style="font-weight:700">🥛 Whole Milk</td>
+                  <td><span class="badge badge-blue">Dairy</span></td>
+                  <td><div style="display:flex;align-items:center;gap:8px"><div class="progress-wrap" style="width:100px;flex-shrink:0"><div class="progress-bar progress-red" style="width:12%"></div></div><span style="font-size:11px;color:var(--danger)">12%</span></div></td>
+                  <td style="font-weight:700">18 L</td>
+                  <td style="font-size:12px;color:var(--muted)">30 L</td>
+                  <td><span class="badge badge-red">Low Stock</span></td>
+                  <td><div style="display:flex;gap:5px"><button class="btn btn-outline btn-xs">Edit</button><button class="btn btn-danger btn-xs">Urgent</button></div></td>
+                </tr>
+                <tr>
+                  <td style="font-weight:700">🍅 Tomatoes</td>
+                  <td><span class="badge badge-green">Produce</span></td>
+                  <td><div style="display:flex;align-items:center;gap:8px"><div class="progress-wrap" style="width:100px;flex-shrink:0"><div class="progress-bar progress-green" style="width:60%"></div></div><span style="font-size:11px;color:var(--muted)">60%</span></div></td>
+                  <td style="font-weight:700">210 kg</td>
+                  <td style="font-size:12px;color:var(--muted)">40 kg</td>
+                  <td><span class="badge badge-green">In Stock</span></td>
+                  <td><div style="display:flex;gap:5px"><button class="btn btn-outline btn-xs">Edit</button><button class="btn btn-info btn-xs">Restock</button></div></td>
+                </tr>
+                <tr>
+                  <td style="font-weight:700">🧴 Olive Oil</td>
+                  <td><span class="badge badge-warn">Pantry</span></td>
+                  <td><div style="display:flex;align-items:center;gap:8px"><div class="progress-wrap" style="width:100px;flex-shrink:0"><div class="progress-bar progress-red" style="width:0%"></div></div><span style="font-size:11px;color:var(--danger)">0%</span></div></td>
+                  <td style="font-weight:700">0 bottles</td>
+                  <td style="font-size:12px;color:var(--muted)">10 bottles</td>
+                  <td><span class="badge badge-red">Out of Stock</span></td>
+                  <td><div style="display:flex;gap:5px"><button class="btn btn-outline btn-xs">Edit</button><button class="btn btn-danger btn-xs">Order Now</button></div></td>
+                </tr>
+                <tr>
+                  <td style="font-weight:700">🥦 Broccoli</td>
+                  <td><span class="badge badge-green">Produce</span></td>
+                  <td><div style="display:flex;align-items:center;gap:8px"><div class="progress-wrap" style="width:100px;flex-shrink:0"><div class="progress-bar progress-orange" style="width:35%"></div></div><span style="font-size:11px;color:var(--accent)">35%</span></div></td>
+                  <td style="font-weight:700">95 kg</td>
+                  <td style="font-size:12px;color:var(--muted)">30 kg</td>
+                  <td><span class="badge badge-green">In Stock</span></td>
+                  <td><div style="display:flex;gap:5px"><button class="btn btn-outline btn-xs">Edit</button><button class="btn btn-info btn-xs">Restock</button></div></td>
+                </tr>
+                <tr>
+                  <td style="font-weight:700">🍳 Eggs</td>
+                  <td><span class="badge badge-blue">Dairy</span></td>
+                  <td><div style="display:flex;align-items:center;gap:8px"><div class="progress-wrap" style="width:100px;flex-shrink:0"><div class="progress-bar progress-red" style="width:18%"></div></div><span style="font-size:11px;color:var(--danger)">18%</span></div></td>
+                  <td style="font-weight:700">54 doz</td>
+                  <td style="font-size:12px;color:var(--muted)">60 doz</td>
+                  <td><span class="badge badge-red">Low Stock</span></td>
+                  <td><div style="display:flex;gap:5px"><button class="btn btn-outline btn-xs">Edit</button><button class="btn btn-danger btn-xs">Urgent</button></div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- =====================================================
+           ADMIN: SETTINGS
+      ===================================================== -->
+      <div class="panel" id="panel-admin-settings">
+        <div class="two-col">
+          <div>
+            <div class="card" style="margin-bottom:18px">
+              <div class="card-head"><h3>General Settings</h3></div>
+              <div class="card-body">
+                <div class="form-group"><label>App Name</label><input class="form-control" value="GrocerHub" /></div>
+                <div class="form-group"><label>Default Currency</label><select class="form-control"><option>₹ INR</option><option>$ USD</option><option>€ EUR</option></select></div>
+                <div class="form-group"><label>Time Zone</label><select class="form-control"><option>Asia/Kolkata (IST)</option><option>UTC</option></select></div>
+                <div class="form-group"><label>Default Language</label><select class="form-control"><option>English</option><option>Hindi</option><option>Marathi</option></select></div>
+                <button class="btn btn-primary">Save Changes</button>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head"><h3>Notifications</h3></div>
+              <div class="card-body">
+                <div style="display:flex;flex-direction:column;gap:14px">
+                  <div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:13px;font-weight:600">Low Stock Alerts</div><div style="font-size:11px;color:var(--muted)">Notify when stock falls below threshold</div></div><input type="checkbox" checked style="width:18px;height:18px;accent-color:var(--primary)"/></div>
+                  <div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:13px;font-weight:600">New User Signups</div><div style="font-size:11px;color:var(--muted)">Email on each new registration</div></div><input type="checkbox" checked style="width:18px;height:18px;accent-color:var(--primary)"/></div>
+                  <div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:13px;font-weight:600">Order Delays</div><div style="font-size:11px;color:var(--muted)">Alert on delivery delays</div></div><input type="checkbox" style="width:18px;height:18px;accent-color:var(--primary)"/></div>
+                  <div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:13px;font-weight:600">System Reports</div><div style="font-size:11px;color:var(--muted)">Weekly summary email</div></div><input type="checkbox" checked style="width:18px;height:18px;accent-color:var(--primary)"/></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="card" style="margin-bottom:18px">
+              <div class="card-head"><h3>Security</h3></div>
+              <div class="card-body">
+                <div class="form-group"><label>Session Timeout (minutes)</label><input class="form-control" type="number" value="30" /></div>
+                <div class="form-group"><label>Max Login Attempts</label><input class="form-control" type="number" value="5" /></div>
+                <div class="form-group"><label>Two-Factor Auth</label><select class="form-control"><option>Enabled for Admins</option><option>Enabled for All</option><option>Disabled</option></select></div>
+                <button class="btn btn-primary">Update Security</button>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head"><h3>Danger Zone</h3></div>
+              <div class="card-body">
+                <div style="display:flex;flex-direction:column;gap:10px">
+                  <button class="btn btn-warn" style="width:100%">🔄 Reset All User Passwords</button>
+                  <button class="btn btn-danger" style="width:100%">🗑️ Clear All Inactive Accounts</button>
+                  <button class="btn btn-danger" style="width:100%">⚠️ Factory Reset System</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- =====================================================
+           MANAGER: LISTS
+      ===================================================== -->
+      <div class="panel" id="panel-manager-lists">
+        <div class="stats-grid stats-grid-4" style="margin-bottom:18px">
+          <div class="stat-card blue"><div class="s-label">Total Lists</div><div class="s-value">1,204</div></div>
+          <div class="stat-card orange"><div class="s-label">Pending Review</div><div class="s-value">38</div></div>
+          <div class="stat-card green"><div class="s-label">Approved</div><div class="s-value">1,142</div></div>
+          <div class="stat-card red"><div class="s-label">Rejected</div><div class="s-value">24</div></div>
+        </div>
+
+        <div class="action-bar">
+          <div class="section-tabs" style="margin:0">
+            <button class="s-tab active">All Lists</button>
+            <button class="s-tab">Pending</button>
+            <button class="s-tab">Approved</button>
+            <button class="s-tab">Rejected</button>
+            <button class="s-tab">Shared</button>
+          </div>
+          <div class="inline-search">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" placeholder="Search lists…" />
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-body-nopad">
+            <table class="data-table">
+              <thead>
+                <tr><th>List Name</th><th>User</th><th>Items</th><th>Est. Cost</th><th>Category</th><th>Created</th><th>Status</th><th>Actions</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="font-weight:700">Weekly Groceries</td>
+                  <td><div class="user-cell"><div class="avatar avatar-sm" style="background:#FCE4EC;color:#880E4F">NP</div><span style="font-size:12px">Neha P.</span></div></td>
+                  <td style="font-weight:700">14</td>
+                  <td style="font-weight:700;color:var(--primary)">₹1,240</td>
+                  <td><span class="badge badge-green">Produce</span></td>
+                  <td style="font-size:12px;color:var(--muted)">Apr 8</td>
+                  <td><span class="badge badge-warn">Pending</span></td>
+                  <td><div style="display:flex;gap:5px"><button class="btn btn-primary btn-xs">Approve</button><button class="btn btn-danger btn-xs">Reject</button><button class="btn btn-outline btn-xs">View</button></div></td>
+                </tr>
+                <tr>
+                  <td style="font-weight:700">Monthly Stock-up</td>
+                  <td><div class="user-cell"><div class="avatar avatar-sm" style="background:#F3E5F5;color:#6A1B9A">PD</div><span style="font-size:12px">Priya D.</span></div></td>
+                  <td style="font-weight:700">32</td>
+                  <td style="font-weight:700;color:var(--primary)">₹4,890</td>
+                  <td><span class="badge badge-blue">Mixed</span></td>
+                  <td style="font-size:12px;color:var(--muted)">Apr 7</td>
+                  <td><span class="badge badge-green">Approved</span></td>
+                  <td><div style="display:flex;gap:5px"><button class="btn btn-outline btn-xs">View</button><button class="btn btn-warn btn-xs">Revoke</button></div></td>
+                </tr>
+                <tr>
+                  <td style="font-weight:700">Office Supplies</td>
+                  <td><div class="user-cell"><div class="avatar avatar-sm" style="background:#FFF3E0;color:#E65100">AK</div><span style="font-size:12px">Arjun K.</span></div></td>
+                  <td style="font-weight:700">8</td>
+                  <td style="font-weight:700;color:var(--primary)">₹620</td>
+                  <td><span class="badge badge-warn">Pantry</span></td>
+                  <td style="font-size:12px;color:var(--muted)">Apr 6</td>
+                  <td><span class="badge badge-red">Rejected</span></td>
+                  <td><div style="display:flex;gap:5px"><button class="btn btn-outline btn-xs">View</button><button class="btn btn-primary btn-xs">Re-approve</button></div></td>
+                </tr>
+                <tr>
+                  <td style="font-weight:700">Breakfast Essentials</td>
+                  <td><div class="user-cell"><div class="avatar avatar-sm" style="background:#FCE4EC;color:#880E4F">NP</div><span style="font-size:12px">Neha P.</span></div></td>
+                  <td style="font-weight:700">9</td>
+                  <td style="font-weight:700;color:var(--primary)">₹780</td>
+                  <td><span class="badge badge-blue">Dairy</span></td>
+                  <td style="font-size:12px;color:var(--muted)">Apr 5</td>
+                  <td><span class="badge badge-green">Approved</span></td>
+                  <td><div style="display:flex;gap:5px"><button class="btn btn-outline btn-xs">View</button><button class="btn btn-warn btn-xs">Revoke</button></div></td>
+                </tr>
+                <tr>
+                  <td style="font-weight:700">Diwali Shopping</td>
+                  <td><div class="user-cell"><div class="avatar avatar-sm" style="background:#E8F5E9;color:#1B5E20">SK</div><span style="font-size:12px">Sneha K.</span></div></td>
+                  <td style="font-weight:700">22</td>
+                  <td style="font-weight:700;color:var(--primary)">₹3,150</td>
+                  <td><span class="badge badge-purple">Special</span></td>
+                  <td style="font-size:12px;color:var(--muted)">Apr 4</td>
+                  <td><span class="badge badge-warn">Pending</span></td>
+                  <td><div style="display:flex;gap:5px"><button class="btn btn-primary btn-xs">Approve</button><button class="btn btn-danger btn-xs">Reject</button><button class="btn btn-outline btn-xs">View</button></div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- =====================================================
+           MANAGER: ORDERS
+      ===================================================== -->
+      <div class="panel" id="panel-manager-orders">
+        <div class="stats-grid stats-grid-4" style="margin-bottom:18px">
+          <div class="stat-card blue"><div class="s-icon">📦</div><div class="s-label">Orders Today</div><div class="s-value">34</div></div>
+          <div class="stat-card orange"><div class="s-icon">⏳</div><div class="s-label">Pending</div><div class="s-value">8</div></div>
+          <div class="stat-card purple"><div class="s-icon">🚚</div><div class="s-label">Out for Delivery</div><div class="s-value">12</div></div>
+          <div class="stat-card green"><div class="s-icon">✅</div><div class="s-label">Delivered</div><div class="s-value">26</div></div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>Active Orders</h3>
+            <div class="section-tabs" style="margin:0">
+              <button class="s-tab active">All</button>
+              <button class="s-tab">Pending</button>
+              <button class="s-tab">In Transit</button>
+              <button class="s-tab">Delivered</button>
+            </div>
+          </div>
+          <div class="card-body-nopad">
+            <table class="data-table">
+              <thead>
+                <tr><th>Order ID</th><th>Customer</th><th>Items</th><th>Amount</th><th>Address</th><th>Status</th><th>ETA</th><th>Action</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="font-size:12px;font-weight:700;color:var(--muted)">#ORD-2841</td>
+                  <td><div class="user-cell"><div class="avatar avatar-sm" style="background:#FCE4EC;color:#880E4F">NP</div><span style="font-size:12px;font-weight:700">Neha Patil</span></div></td>
+                  <td>14</td>
+                  <td style="font-weight:700;color:var(--primary)">₹1,240</td>
+                  <td style="font-size:11px;color:var(--muted)">Bhayandar West</td>
+                  <td><span class="badge badge-blue">Out for Delivery</span></td>
+                  <td style="font-size:12px;color:var(--muted)">2:30 PM</td>
+                  <td><div style="display:flex;gap:5px"><button class="btn btn-primary btn-xs">Track</button><button class="btn btn-outline btn-xs">Call</button></div></td>
+                </tr>
+                <tr>
+                  <td style="font-size:12px;font-weight:700;color:var(--muted)">#ORD-2840</td>
+                  <td><div class="user-cell"><div class="avatar avatar-sm" style="background:#F3E5F5;color:#6A1B9A">PD</div><span style="font-size:12px;font-weight:700">Priya Desai</span></div></td>
+                  <td>32</td>
+                  <td style="font-weight:700;color:var(--primary)">₹4,890</td>
+                  <td style="font-size:11px;color:var(--muted)">Mira Road</td>
+                  <td><span class="badge badge-warn">Packing</span></td>
+                  <td style="font-size:12px;color:var(--muted)">4:00 PM</td>
+                  <td><div style="display:flex;gap:5px"><button class="btn btn-primary btn-xs">Dispatch</button><button class="btn btn-outline btn-xs">View</button></div></td>
+                </tr>
+                <tr>
+                  <td style="font-size:12px;font-weight:700;color:var(--muted)">#ORD-2839</td>
+                  <td><div class="user-cell"><div class="avatar avatar-sm" style="background:#FFF3E0;color:#E65100">AK</div><span style="font-size:12px;font-weight:700">Arjun Kumar</span></div></td>
+                  <td>8</td>
+                  <td style="font-weight:700;color:var(--primary)">₹620</td>
+                  <td style="font-size:11px;color:var(--muted)">Borivali East</td>
+                  <td><span class="badge badge-green">Delivered</span></td>
+                  <td style="font-size:12px;color:var(--muted)">Done</td>
+                  <td><div style="display:flex;gap:5px"><button class="btn btn-outline btn-xs">Invoice</button></div></td>
+                </tr>
+                <tr>
+                  <td style="font-size:12px;font-weight:700;color:var(--muted)">#ORD-2838</td>
+                  <td><div class="user-cell"><div class="avatar avatar-sm" style="background:#E8F5E9;color:#1B5E20">SK</div><span style="font-size:12px;font-weight:700">Sneha Kale</span></div></td>
+                  <td>22</td>
+                  <td style="font-weight:700;color:var(--primary)">₹3,150</td>
+                  <td style="font-size:11px;color:var(--muted)">Dahisar</td>
+                  <td><span class="badge badge-blue">Out for Delivery</span></td>
+                  <td style="font-size:12px;color:var(--muted)">3:15 PM</td>
+                  <td><div style="display:flex;gap:5px"><button class="btn btn-primary btn-xs">Track</button><button class="btn btn-outline btn-xs">Call</button></div></td>
+                </tr>
+                <tr>
+                  <td style="font-size:12px;font-weight:700;color:var(--muted)">#ORD-2837</td>
+                  <td><div class="user-cell"><div class="avatar avatar-sm" style="background:#FCE4EC;color:#880E4F">NP</div><span style="font-size:12px;font-weight:700">Neha Patil</span></div></td>
+                  <td>9</td>
+                  <td style="font-weight:700;color:var(--primary)">₹780</td>
+                  <td style="font-size:11px;color:var(--muted)">Bhayandar West</td>
+                  <td><span class="badge badge-green">Delivered</span></td>
+                  <td style="font-size:12px;color:var(--muted)">Done</td>
+                  <td><div style="display:flex;gap:5px"><button class="btn btn-outline btn-xs">Invoice</button></div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- =====================================================
+           MANAGER: REPORTS
+      ===================================================== -->
+      <div class="panel" id="panel-manager-reports">
+        <div class="stats-grid stats-grid-4" style="margin-bottom:18px">
+          <div class="stat-card green"><div class="s-label">Monthly Orders</div><div class="s-value">841</div><div class="s-change">↑ 18%</div></div>
+          <div class="stat-card blue"><div class="s-label">Revenue (₹)</div><div class="s-value">2.4L</div><div class="s-change">↑ 12%</div></div>
+          <div class="stat-card orange"><div class="s-label">Avg Basket</div><div class="s-value">₹285</div><div class="s-change">↑ 4%</div></div>
+          <div class="stat-card red"><div class="s-label">Returns</div><div class="s-value">12</div><div class="s-change">↓ 3</div></div>
+        </div>
+        <div class="two-col">
+          <div class="card">
+            <div class="card-head"><h3>Category Breakdown</h3></div>
+            <div class="card-body">
+              <div class="h-bar-row">
+                <div class="hb-header"><span>🥦 Produce</span><span class="hb-pct">42% · ₹1,00,800</span></div>
+                <div class="progress-wrap"><div class="progress-bar progress-green" style="width:42%"></div></div>
+              </div>
+              <div class="h-bar-row">
+                <div class="hb-header"><span>🥛 Dairy</span><span class="hb-pct">28% · ₹67,200</span></div>
+                <div class="progress-wrap"><div class="progress-bar progress-green" style="width:28%"></div></div>
+              </div>
+              <div class="h-bar-row">
+                <div class="hb-header"><span>🍞 Bakery</span><span class="hb-pct">15% · ₹36,000</span></div>
+                <div class="progress-wrap"><div class="progress-bar progress-orange" style="width:15%"></div></div>
+              </div>
+              <div class="h-bar-row">
+                <div class="hb-header"><span>🧴 Pantry</span><span class="hb-pct">10% · ₹24,000</span></div>
+                <div class="progress-wrap"><div class="progress-bar progress-orange" style="width:10%"></div></div>
+              </div>
+              <div class="h-bar-row" style="margin-bottom:0">
+                <div class="hb-header"><span>🥩 Meat & Others</span><span class="hb-pct">5% · ₹12,000</span></div>
+                <div class="progress-wrap"><div class="progress-bar progress-red" style="width:5%"></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h3>Top Performing Users</h3></div>
+            <div class="card-body">
+              <table class="data-table">
+                <thead><tr><th>User</th><th>Orders</th><th>Spent</th></tr></thead>
+                <tbody>
+                  <tr><td><div class="user-cell"><div class="avatar avatar-sm" style="background:#F3E5F5;color:#6A1B9A">PD</div>Priya Desai</div></td><td>32</td><td style="color:var(--primary);font-weight:700">₹4,890</td></tr>
+                  <tr><td><div class="user-cell"><div class="avatar avatar-sm" style="background:#E8F5E9;color:#1B5E20">SK</div>Sneha Kale</div></td><td>28</td><td style="color:var(--primary);font-weight:700">₹3,780</td></tr>
+                  <tr><td><div class="user-cell"><div class="avatar avatar-sm" style="background:#FCE4EC;color:#880E4F">NP</div>Neha Patil</div></td><td>21</td><td style="color:var(--primary);font-weight:700">₹2,020</td></tr>
+                  <tr><td><div class="user-cell"><div class="avatar avatar-sm" style="background:#FFF3E0;color:#E65100">AK</div>Arjun Kumar</div></td><td>8</td><td style="color:var(--primary);font-weight:700">₹620</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- =====================================================
+           MANAGER: APPROVALS
+      ===================================================== -->
+      <div class="panel" id="panel-manager-approval">
+        <div class="stats-grid stats-grid-3" style="margin-bottom:18px">
+          <div class="stat-card orange"><div class="s-label">Pending Approval</div><div class="s-value">38</div></div>
+          <div class="stat-card green"><div class="s-label">Approved Today</div><div class="s-value">15</div></div>
+          <div class="stat-card red"><div class="s-label">Rejected Today</div><div class="s-value">3</div></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>Pending Approvals</h3><span class="card-subtitle">Oldest first</span></div>
+          <div class="card-body-nopad">
+            <table class="data-table">
+              <thead><tr><th>List</th><th>User</th><th>Items</th><th>Value</th><th>Reason</th><th>Submitted</th><th>Actions</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td style="font-weight:700">Weekly Groceries</td>
+                  <td><div class="user-cell"><div class="avatar avatar-sm" style="background:#FCE4EC;color:#880E4F">NP</div>Neha P.</div></td>
+                  <td>14</td><td style="color:var(--primary);font-weight:700">₹1,240</td>
+                  <td style="font-size:12px;color:var(--muted)">Regular weekly shop</td>
+                  <td style="font-size:12px;color:var(--muted)">2h ago</td>
+                  <td><div style="display:flex;gap:5px">
+                    <button class="btn btn-primary btn-xs" onclick="approve(this)">✓ Approve</button>
+                    <button class="btn btn-danger btn-xs" onclick="reject(this)">✗ Reject</button>
+                  </div></td>
+                </tr>
+                <tr>
+                  <td style="font-weight:700">Diwali Shopping</td>
+                  <td><div class="user-cell"><div class="avatar avatar-sm" style="background:#E8F5E9;color:#1B5E20">SK</div>Sneha K.</div></td>
+                  <td>22</td><td style="color:var(--primary);font-weight:700">₹3,150</td>
+                  <td style="font-size:12px;color:var(--muted)">Festival bulk buy</td>
+                  <td style="font-size:12px;color:var(--muted)">5h ago</td>
+                  <td><div style="display:flex;gap:5px">
+                    <button class="btn btn-primary btn-xs" onclick="approve(this)">✓ Approve</button>
+                    <button class="btn btn-danger btn-xs" onclick="reject(this)">✗ Reject</button>
+                  </div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- =====================================================
+           USER: MY GROCERY LIST
+      ===================================================== -->
+      <div class="panel" id="panel-user-list">
+        <div class="action-bar">
+          <div class="section-tabs" style="margin:0" id="cat-tabs">
+            <button class="s-tab active" onclick="filterCat('all',this)">All</button>
+            <button class="s-tab" onclick="filterCat('produce',this)">🥦 Produce</button>
+            <button class="s-tab" onclick="filterCat('dairy',this)">🥛 Dairy</button>
+            <button class="s-tab" onclick="filterCat('pantry',this)">🧴 Pantry</button>
+          </div>
+          <div style="display:flex;gap:8px">
+            <select class="form-control" style="padding:7px 10px;width:auto" id="sort-select" onchange="sortList()">
+              <option value="default">Default Order</option>
+              <option value="az">A → Z</option>
+              <option value="qty">By Qty</option>
+            </select>
+            <button class="btn btn-primary" onclick="document.getElementById('add-item-modal').classList.add('open')">+ Add Item</button>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:0">
+          <div class="grocery-list" id="grocery-list">
+            <div class="g-item" data-cat="produce" onclick="toggleItem(this)">
+              <div class="g-checkbox">✓</div>
+              <div class="g-icon" style="background:#E8F5E9">🥦</div>
+              <div class="g-info"><div class="g-name">Broccoli</div><div class="g-sub">Fresh, any size</div><div class="g-substitute">Try: Cauliflower, Cabbage</div></div>
+              <div class="g-qty">6 cups</div>
+            </div>
+            <div class="g-item" data-cat="produce" onclick="toggleItem(this)">
+              <div class="g-checkbox">✓</div>
+              <div class="g-icon" style="background:#FFF9C4">🍌</div>
+              <div class="g-info"><div class="g-name">Bananas</div><div class="g-sub">7in or 18cm</div><div class="g-substitute">Try: Plantains</div></div>
+              <div class="g-qty">6 pcs</div>
+            </div>
+            <div class="g-item checked" data-cat="produce" onclick="toggleItem(this)">
+              <div class="g-checkbox" style="background:var(--primary);border-color:var(--primary);color:#fff">✓</div>
+              <div class="g-icon" style="background:#FCE4EC;opacity:0.45">🍎</div>
+              <div class="g-info"><div class="g-info checked-item"><div class="g-name">Apples</div><div class="g-sub">2 lb bag</div></div></div>
+              <div class="g-qty" style="text-decoration:line-through;color:var(--muted)">2 lb</div>
+            </div>
+            <div class="g-item" data-cat="produce" onclick="toggleItem(this)">
+              <div class="g-checkbox">✓</div>
+              <div class="g-icon" style="background:#FFEBEE">🍅</div>
+              <div class="g-info"><div class="g-name">Tomatoes</div><div class="g-sub">Vine or roma</div><div class="g-substitute">Try: Cherry tomatoes</div></div>
+              <div class="g-qty">4.25 cups</div>
+            </div>
+            <div class="g-item" data-cat="produce" onclick="toggleItem(this)">
+              <div class="g-checkbox">✓</div>
+              <div class="g-icon" style="background:#F3E5F5">🧅</div>
+              <div class="g-info"><div class="g-name">Onions</div><div class="g-sub">Any type</div></div>
+              <div class="g-qty">3 cups</div>
+            </div>
+            <div class="g-item checked" data-cat="produce" onclick="toggleItem(this)">
+              <div class="g-checkbox" style="background:var(--primary);border-color:var(--primary);color:#fff">✓</div>
+              <div class="g-icon" style="background:#FCE4EC;opacity:0.45">🍓</div>
+              <div class="g-info checked-item"><div class="g-name">Strawberries</div><div class="g-sub">Frozen or fresh</div></div>
+              <div class="g-qty" style="text-decoration:line-through;color:var(--muted)">4 cups</div>
+            </div>
+            <div class="g-item" data-cat="dairy" onclick="toggleItem(this)">
+              <div class="g-checkbox">✓</div>
+              <div class="g-icon" style="background:#E3F2FD">🥛</div>
+              <div class="g-info"><div class="g-name">Whole Milk</div><div class="g-sub">Full fat</div><div class="g-substitute">Try: Oat milk, Almond milk</div></div>
+              <div class="g-qty">2 L</div>
+            </div>
+            <div class="g-item" data-cat="dairy" onclick="toggleItem(this)">
+              <div class="g-checkbox">✓</div>
+              <div class="g-icon" style="background:#FFF9C4">🍳</div>
+              <div class="g-info"><div class="g-name">Eggs</div><div class="g-sub">Free range</div></div>
+              <div class="g-qty">12 pcs</div>
+            </div>
+            <div class="g-item" data-cat="pantry" onclick="toggleItem(this)">
+              <div class="g-checkbox">✓</div>
+              <div class="g-icon" style="background:#FFF3E0">🧴</div>
+              <div class="g-info"><div class="g-name">Olive Oil</div><div class="g-sub">Extra virgin</div><div class="g-substitute">Try: Sunflower oil</div></div>
+              <div class="g-qty">500 ml</div>
+            </div>
+            <div class="g-item" data-cat="pantry" onclick="toggleItem(this)">
+              <div class="g-checkbox">✓</div>
+              <div class="g-icon" style="background:#EEEEEE">🍚</div>
+              <div class="g-info"><div class="g-name">Rice</div><div class="g-sub">Basmati</div></div>
+              <div class="g-qty">2 kg</div>
+            </div>
+          </div>
+          <div class="quick-add">
+            <input type="text" id="new-item-name" placeholder="Item name…" />
+            <input type="text" id="new-item-qty" placeholder="Qty (e.g. 2 cups)" style="max-width:120px" />
+            <select id="new-item-cat">
+              <option value="produce">Produce</option>
+              <option value="dairy">Dairy</option>
+              <option value="pantry">Pantry</option>
+            </select>
+            <button class="btn btn-primary" onclick="quickAddItem()">Add</button>
+          </div>
+          <div class="list-bottom" id="list-bottom">
+            <div class="lb-group">
+              <div class="lb-label">Unchecked · <span id="unchecked-count">8</span> items</div>
+              <div class="lb-value" style="color:var(--text)">₹<span id="unchecked-val">1,680</span></div>
+            </div>
+            <div style="display:flex;gap:16px;align-items:center">
+              <div class="lb-group" style="text-align:right">
+                <div class="lb-label">Checked · <span id="checked-count">2</span> items</div>
+                <div class="lb-value" style="color:var(--primary)">₹<span id="checked-val">320</span></div>
+              </div>
+              <button class="btn btn-primary">🚚 Place Order</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- =====================================================
+           USER: ORDER HISTORY
+      ===================================================== -->
+      <div class="panel" id="panel-user-history">
+        <div class="card">
+          <div class="card-head"><h3>Your Order History</h3></div>
+          <div class="card-body-nopad">
+            <table class="data-table">
+              <thead><tr><th>List Name</th><th>Date</th><th>Items</th><th>Total Spent</th><th>Status</th><th>Action</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td style="font-weight:700">Weekly Groceries</td>
+                  <td style="font-size:12px;color:var(--muted)">Apr 8, 2026</td>
+                  <td>14</td>
+                  <td style="color:var(--primary);font-weight:700">₹1,240</td>
+                  <td><span class="badge badge-blue">In Progress</span></td>
+                  <td><button class="btn btn-primary btn-xs">Continue</button></td>
+                </tr>
+                <tr>
+                  <td style="font-weight:700">Breakfast Essentials</td>
+                  <td style="font-size:12px;color:var(--muted)">Apr 5, 2026</td>
+                  <td>9</td>
+                  <td style="color:var(--primary);font-weight:700">₹780</td>
+                  <td><span class="badge badge-green">Delivered</span></td>
+                  <td><button class="btn btn-outline btn-xs">Reorder</button></td>
+                </tr>
+                <tr>
+                  <td style="font-weight:700">Diwali Shopping</td>
+                  <td style="font-size:12px;color:var(--muted)">Mar 28, 2026</td>
+                  <td>22</td>
+                  <td style="color:var(--primary);font-weight:700">₹3,150</td>
+                  <td><span class="badge badge-green">Delivered</span></td>
+                  <td><button class="btn btn-outline btn-xs">Reorder</button></td>
+                </tr>
+                <tr>
+                  <td style="font-weight:700">Monthly Stock-up</td>
+                  <td style="font-size:12px;color:var(--muted)">Mar 15, 2026</td>
+                  <td>31</td>
+                  <td style="color:var(--primary);font-weight:700">₹4,520</td>
+                  <td><span class="badge badge-green">Delivered</span></td>
+                  <td><button class="btn btn-outline btn-xs">Reorder</button></td>
+                </tr>
+                <tr>
+                  <td style="font-weight:700">Holi Sweets Run</td>
+                  <td style="font-size:12px;color:var(--muted)">Mar 10, 2026</td>
+                  <td>7</td>
+                  <td style="color:var(--primary);font-weight:700">₹540</td>
+                  <td><span class="badge badge-green">Delivered</span></td>
+                  <td><button class="btn btn-outline btn-xs">Reorder</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- =====================================================
+           USER: PROFILE
+      ===================================================== -->
+      <div class="panel" id="panel-user-profile">
+        <div class="two-col">
+          <div>
+            <div class="card" style="margin-bottom:18px">
+              <div class="card-head"><h3>My Profile</h3></div>
+              <div class="card-body">
+                <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px">
+                  <div class="avatar avatar-lg" style="background:#FCE4EC;color:#880E4F;width:56px;height:56px;font-size:18px">NP</div>
+                  <div>
+                    <div style="font-family:'Nunito',sans-serif;font-size:18px;font-weight:800">Neha Patil</div>
+                    <div style="font-size:12px;color:var(--muted)">neha@example.com</div>
+                    <span class="badge badge-orange" style="margin-top:4px">User</span>
+                  </div>
+                </div>
+                <div class="form-group"><label>Full Name</label><input class="form-control" value="Neha Patil" /></div>
+                <div class="form-group"><label>Email</label><input class="form-control" value="neha@example.com" /></div>
+                <div class="form-group"><label>Phone</label><input class="form-control" value="+91 98765 43210" /></div>
+                <div class="form-group"><label>Default Delivery Address</label><input class="form-control" value="Bhayandar West, Thane, Maharashtra" /></div>
+                <button class="btn btn-primary">Save Profile</button>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="card" style="margin-bottom:18px">
+              <div class="card-head"><h3>Preferences</h3></div>
+              <div class="card-body">
+                <div class="form-group"><label>Preferred Currency</label><select class="form-control"><option>₹ INR</option><option>$ USD</option></select></div>
+                <div class="form-group"><label>Language</label><select class="form-control"><option>English</option><option>Hindi</option><option>Marathi</option></select></div>
+                <div class="form-group"><label>List View</label><select class="form-control"><option>Sorted by Category</option><option>Alphabetical</option><option>Custom Order</option></select></div>
+                <div style="display:flex;flex-direction:column;gap:12px;margin-top:10px">
+                  <div style="display:flex;justify-content:space-between;align-items:center"><div style="font-size:13px;font-weight:600">Show substitute suggestions</div><input type="checkbox" checked style="width:18px;height:18px;accent-color:var(--primary)" /></div>
+                  <div style="display:flex;justify-content:space-between;align-items:center"><div style="font-size:13px;font-weight:600">Order reminders</div><input type="checkbox" checked style="width:18px;height:18px;accent-color:var(--primary)" /></div>
+                  <div style="display:flex;justify-content:space-between;align-items:center"><div style="font-size:13px;font-weight:600">Share lists with family</div><input type="checkbox" style="width:18px;height:18px;accent-color:var(--primary)" /></div>
+                </div>
+                <button class="btn btn-primary" style="margin-top:16px">Save Preferences</button>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head"><h3>Quick Stats</h3></div>
+              <div class="card-body">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                  <div style="text-align:center;padding:12px;background:var(--primary-pale);border-radius:8px"><div style="font-size:11px;color:var(--primary);font-weight:700;text-transform:uppercase">Total Orders</div><div style="font-family:'Nunito',sans-serif;font-size:24px;font-weight:900;color:var(--primary)">83</div></div>
+                  <div style="text-align:center;padding:12px;background:var(--info-light);border-radius:8px"><div style="font-size:11px;color:var(--info);font-weight:700;text-transform:uppercase">Total Spent</div><div style="font-family:'Nunito',sans-serif;font-size:24px;font-weight:900;color:var(--info)">₹10.2L</div></div>
+                  <div style="text-align:center;padding:12px;background:var(--accent-light);border-radius:8px"><div style="font-size:11px;color:var(--accent);font-weight:700;text-transform:uppercase">Avg Order</div><div style="font-family:'Nunito',sans-serif;font-size:24px;font-weight:900;color:var(--accent)">₹284</div></div>
+                  <div style="text-align:center;padding:12px;background:var(--purple-light);border-radius:8px"><div style="font-size:11px;color:var(--purple);font-weight:700;text-transform:uppercase">Saved Items</div><div style="font-family:'Nunito',sans-serif;font-size:24px;font-weight:900;color:var(--purple)">47</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /page-body -->
+  </div><!-- /main-content -->
+</div><!-- /app-shell -->
+
+<!-- =====================================================
+     MODALS
+===================================================== -->
+<!-- Add User Modal -->
+<div class="modal-overlay" id="add-user-modal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>Add New User</h3>
+      <button class="modal-close" onclick="document.getElementById('add-user-modal').classList.remove('open')">✕</button>
+    </div>
+    <div class="form-row form-row-2">
+      <div class="form-group"><label>First Name</label><input class="form-control" placeholder="Rahul" /></div>
+      <div class="form-group"><label>Last Name</label><input class="form-control" placeholder="Sharma" /></div>
+    </div>
+    <div class="form-group"><label>Email Address</label><input class="form-control" placeholder="rahul@example.com" type="email" /></div>
+    <div class="form-row form-row-2">
+      <div class="form-group"><label>Role</label><select class="form-control"><option>User</option><option>Manager</option><option>Admin</option></select></div>
+      <div class="form-group"><label>Phone</label><input class="form-control" placeholder="+91 XXXXX XXXXX" /></div>
+    </div>
+    <div class="form-group"><label>Temporary Password</label><input class="form-control" type="password" placeholder="Auto-generate" /></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="document.getElementById('add-user-modal').classList.remove('open')">Cancel</button>
+      <button class="btn btn-primary" onclick="document.getElementById('add-user-modal').classList.remove('open')">Create User</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Item Modal -->
+<div class="modal-overlay" id="add-item-modal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>Add Grocery Item</h3>
+      <button class="modal-close" onclick="document.getElementById('add-item-modal').classList.remove('open')">✕</button>
+    </div>
+    <div class="form-group"><label>Item Name</label><input class="form-control" placeholder="e.g. Spinach" /></div>
+    <div class="form-row form-row-2">
+      <div class="form-group"><label>Quantity</label><input class="form-control" placeholder="e.g. 2 cups" /></div>
+      <div class="form-group"><label>Category</label><select class="form-control"><option>Produce</option><option>Dairy</option><option>Pantry</option><option>Bakery</option><option>Meat</option></select></div>
+    </div>
+    <div class="form-group"><label>Notes (optional)</label><input class="form-control" placeholder="e.g. frozen or fresh" /></div>
+    <div class="form-group"><label>Substitute Suggestions</label><input class="form-control" placeholder="e.g. Kale, Lettuce" /></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="document.getElementById('add-item-modal').classList.remove('open')">Cancel</button>
+      <button class="btn btn-primary" onclick="document.getElementById('add-item-modal').classList.remove('open')">Add to List</button>
+    </div>
+  </div>
+</div>
+
+<!-- =====================================================
+     JAVASCRIPT
+===================================================== -->
+<script>
+  // ---- Navigation config ----
+  const panelMeta = {
+    'admin-dashboard':  { panel: 'Admin',   title: 'Dashboard',        uname: 'Super Admin',  urole: 'Administrator', avatar: 'SA', abg: '#E8F5E9', acol: '#2E7D32' },
+    'admin-users':      { panel: 'Admin',   title: 'Users',            uname: 'Super Admin',  urole: 'Administrator', avatar: 'SA', abg: '#E8F5E9', acol: '#2E7D32' },
+    'admin-inventory':  { panel: 'Admin',   title: 'Inventory',        uname: 'Super Admin',  urole: 'Administrator', avatar: 'SA', abg: '#E8F5E9', acol: '#2E7D32' },
+    'admin-settings':   { panel: 'Admin',   title: 'Settings',         uname: 'Super Admin',  urole: 'Administrator', avatar: 'SA', abg: '#E8F5E9', acol: '#2E7D32' },
+    'manager-lists':    { panel: 'Manager', title: 'All Lists',        uname: 'Ravi Mehta',   urole: 'Manager',       avatar: 'RM', abg: '#E3F2FD', acol: '#1565C0' },
+    'manager-orders':   { panel: 'Manager', title: 'Orders',           uname: 'Ravi Mehta',   urole: 'Manager',       avatar: 'RM', abg: '#E3F2FD', acol: '#1565C0' },
+    'manager-reports':  { panel: 'Manager', title: 'Reports',          uname: 'Ravi Mehta',   urole: 'Manager',       avatar: 'RM', abg: '#E3F2FD', acol: '#1565C0' },
+    'manager-approval': { panel: 'Manager', title: 'Approvals',        uname: 'Ravi Mehta',   urole: 'Manager',       avatar: 'RM', abg: '#E3F2FD', acol: '#1565C0' },
+    'user-list':        { panel: 'User',    title: 'My Grocery List',  uname: 'Neha Patil',   urole: 'Customer',      avatar: 'NP', abg: '#FCE4EC', acol: '#880E4F' },
+    'user-history':     { panel: 'User',    title: 'Order History',    uname: 'Neha Patil',   urole: 'Customer',      avatar: 'NP', abg: '#FCE4EC', acol: '#880E4F' },
+    'user-profile':     { panel: 'User',    title: 'My Profile',       uname: 'Neha Patil',   urole: 'Customer',      avatar: 'NP', abg: '#FCE4EC', acol: '#880E4F' },
+  };
+
+  function navigate(id, el) {
+    // Hide all panels
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    // Show target
+    document.getElementById('panel-' + id).classList.add('active');
+    el.classList.add('active');
+    // Update topbar
+    const m = panelMeta[id];
+    if (m) {
+      document.getElementById('topbar-panel-name').textContent = m.panel + ' Panel';
+      document.getElementById('topbar-page-title').textContent = m.title;
+      document.getElementById('topbar-uname').textContent = m.uname;
+      document.getElementById('topbar-urole').textContent = m.urole;
+      const av = document.getElementById('topbar-avatar');
+      av.textContent = m.avatar;
+      av.style.background = m.abg;
+      av.style.color = m.acol;
+    }
+  }
+
+  // ---- Toggle grocery item ----
+  function toggleItem(row) {
+    const cb = row.querySelector('.g-checkbox');
+    const icon = row.querySelector('.g-icon');
+    const isChecked = row.classList.contains('checked');
+    if (isChecked) {
+      row.classList.remove('checked');
+      cb.style.background = '';
+      cb.style.borderColor = '';
+      cb.style.color = 'transparent';
+      icon.style.opacity = '1';
+      // fix qty
+      const qty = row.querySelector('.g-qty');
+      qty.style.textDecoration = '';
+      qty.style.color = '';
+      // fix name
+      const info = row.querySelector('.g-info');
+      info.classList.remove('checked-item');
+    } else {
+      row.classList.add('checked');
+      cb.style.background = 'var(--primary)';
+      cb.style.borderColor = 'var(--primary)';
+      cb.style.color = '#fff';
+      icon.style.opacity = '0.45';
+      const qty = row.querySelector('.g-qty');
+      qty.style.textDecoration = 'line-through';
+      qty.style.color = 'var(--muted)';
+      const info = row.querySelector('.g-info');
+      info.classList.add('checked-item');
+    }
+    updateCounts();
+  }
+
+  function updateCounts() {
+    const items = document.querySelectorAll('#grocery-list .g-item');
+    let checked = 0, unchecked = 0;
+    items.forEach(i => { if (i.style.display !== 'none') { i.classList.contains('checked') ? checked++ : unchecked++; } });
+    document.getElementById('checked-count').textContent = checked;
+    document.getElementById('unchecked-count').textContent = unchecked;
+    document.getElementById('checked-val').textContent = (checked * 160).toLocaleString('en-IN');
+    document.getElementById('unchecked-val').textContent = (unchecked * 210).toLocaleString('en-IN');
+  }
+
+  // ---- Filter by category ----
+  function filterCat(cat, btn) {
+    document.querySelectorAll('#cat-tabs .s-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('#grocery-list .g-item').forEach(item => {
+      item.style.display = (cat === 'all' || item.dataset.cat === cat) ? '' : 'none';
+    });
+    updateCounts();
+  }
+
+  // ---- Sort list ----
+  function sortList() {
+    const val = document.getElementById('sort-select').value;
+    const list = document.getElementById('grocery-list');
+    const items = Array.from(list.querySelectorAll('.g-item'));
+    if (val === 'az') {
+      items.sort((a, b) => a.querySelector('.g-name').textContent.localeCompare(b.querySelector('.g-name').textContent));
+    } else if (val === 'qty') {
+      items.sort((a, b) => a.querySelector('.g-qty').textContent.localeCompare(b.querySelector('.g-qty').textContent));
+    }
+    items.forEach(i => list.insertBefore(i, list.querySelector('.quick-add') ? null : undefined));
+    items.forEach(i => list.appendChild(i));
+  }
+
+  // ---- Quick add item ----
+  function quickAddItem() {
+    const name = document.getElementById('new-item-name').value.trim();
+    const qty = document.getElementById('new-item-qty').value.trim();
+    const cat = document.getElementById('new-item-cat').value;
+    if (!name) return;
+    const emojis = { produce: '🥬', dairy: '🧈', pantry: '🫙' };
+    const colors = { produce: '#E8F5E9', dairy: '#E3F2FD', pantry: '#FFF3E0' };
+    const list = document.getElementById('grocery-list');
+    const div = document.createElement('div');
+    div.className = 'g-item';
+    div.dataset.cat = cat;
+    div.onclick = function() { toggleItem(this); };
+    div.innerHTML = `
+      <div class="g-checkbox" style="color:transparent">✓</div>
+      <div class="g-icon" style="background:${colors[cat]}">${emojis[cat]}</div>
+      <div class="g-info"><div class="g-name">${name}</div><div class="g-sub">${cat}</div></div>
+      <div class="g-qty">${qty || '1'}</div>
+    `;
+    list.appendChild(div);
+    document.getElementById('new-item-name').value = '';
+    document.getElementById('new-item-qty').value = '';
+    updateCounts();
+  }
+
+  // ---- Approve/reject rows ----
+  function approve(btn) {
+    const row = btn.closest('tr');
+    const td = row.querySelector('td:nth-child(7)') || row.querySelector('td:last-child');
+    row.querySelector('td:nth-child(6)') && (row.querySelector('td:nth-child(6)').innerHTML = '<span class="badge badge-green">Approved</span>');
+    btn.closest('td').innerHTML = '<button class="btn btn-warn btn-xs" onclick="reject(this)">✗ Reject</button>';
+  }
+  function reject(btn) {
+    const row = btn.closest('tr');
+    const statusCell = row.querySelector('td:nth-child(6)');
+    if (statusCell) statusCell.innerHTML = '<span class="badge badge-red">Rejected</span>';
+    btn.closest('td').innerHTML = '<button class="btn btn-primary btn-xs" onclick="approve(this)">✓ Re-approve</button>';
+  }
+
+  // ---- User table search ----
+  function filterUsers() {
+    const val = document.getElementById('user-search').value.toLowerCase();
+    document.querySelectorAll('#users-table tbody tr').forEach(row => {
+      row.style.display = row.textContent.toLowerCase().includes(val) ? '' : 'none';
+    });
+  }
+
+  // ---- Section tab switching ----
+  document.querySelectorAll('.section-tabs').forEach(tabs => {
+    tabs.querySelectorAll('.s-tab').forEach(tab => {
+      tab.addEventListener('click', function() {
+        if (this.getAttribute('onclick')) return;
+        tabs.querySelectorAll('.s-tab').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+  });
+
+  // ---- Close modal on overlay click ----
+  document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', function(e) {
+      if (e.target === this) this.classList.remove('open');
+    });
+  });
+
+  // ---- Init counts ----
+  updateCounts();
+</script>
+
+</body>
+</html>
